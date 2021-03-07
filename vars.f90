@@ -9,7 +9,7 @@ implicit none
 real u   (dimx1_u:dimx2_u, dimy1_u:dimy2_u, nzm) ! x-wind
 real v   (dimx1_v:dimx2_v, dimy1_v:dimy2_v, nzm) ! y-wind
 real w   (dimx1_w:dimx2_w, dimy1_w:dimy2_w, nz ) ! z-wind
-real t   (dimx1_s:dimx2_s, dimy1_s:dimy2_s, nzm) ! liquid/ice water static energy 
+real t   (dimx1_s:dimx2_s, dimy1_s:dimy2_s, nzm) ! liquid/ice water static energy
 
 !--------------------------------------------------------------------
 ! diagnostic variables:
@@ -21,7 +21,7 @@ real qcl     (nx, ny, nzm)                ! liquid water  (condensate)
 real qpl     (nx, ny, nzm)                ! liquid water  (precipitation)
 real qci     (nx, ny, nzm)                ! ice water  (condensate)
 real qpi     (nx, ny, nzm)                ! ice water  (precipitation)
-        
+
 !--------------------------------------------------------------------
 ! time-tendencies for prognostic variables
 
@@ -45,9 +45,9 @@ real precsfc(nx,ny) ! surface precip. rate
 !   surface transfer coef for water and surface qsat.  These are
 !   useful for computing surface fluxes of isoptopic water.
 real ustar (nx, ny), fluxbq_coef (nx, ny), qsat_surf (nx, ny), u10arr(nx, ny)
-                
+
 !-----------------------------------------------------------------
-! profiles 
+! profiles
 
 real   t0(nzm), q0(nzm), qv0(nzm), tabs0(nzm), tl0(nzm), &
        tv0(nzm), u0(nzm), v0(nzm), &
@@ -56,7 +56,7 @@ real   t0(nzm), q0(nzm), qv0(nzm), tabs0(nzm), tl0(nzm), &
        usounding0(nzm), vsounding0(nzm), tg0_ref(nzm), qg0_ref(nzm), &
        qcldliq0(nzm), qpcpliq0(nzm), qcldice0(nzm), qpcpice0(nzm)
 !----------------------------------------------------------------
-! "observed" (read from snd file) surface characteristics 
+! "observed" (read from snd file) surface characteristics
 
 real ::  sstobs = 0., lhobs = 0., shobs = 0.
 !----------------------------------------------------------------
@@ -67,9 +67,9 @@ real   gamq0    ! gradient of q() at the top,g/g/m
 
 !-----------------------------------------------------------------
 ! reference vertical profiles:
- 
+
 real   prespot(nzm)  ! (1000./pres)**R/cp
-real   rho(nzm)	  ! air density at pressure levels,kg/m3 
+real   rho(nzm)	  ! air density at pressure levels,kg/m3
 real   rhow(nz)   ! air density at vertical velocity levels,kg/m3
 real   bet(nzm)	  ! = ggr/tv0
 real   gamaz(nzm) ! ggr/cp*z
@@ -96,17 +96,17 @@ real, allocatable :: wgls(:,:) ! Large-scale subsidence velocity,m/s
 real, allocatable :: pres0ls(:)! Surface pressure, mb
 real, allocatable :: zls(:,:)  ! Height
 real, allocatable :: pls(:,:)  ! Pressure
-real, allocatable :: dayls(:)  ! Large-scale forcing arrays time (days) 
+real, allocatable :: dayls(:)  ! Large-scale forcing arrays time (days)
 real, allocatable :: utraj_ls(:)  ! Zonal velocity of forcings (for Lagrangian-type simulations)
 real, allocatable :: vtraj_ls(:)  ! Meridional velocity of forcings (for Lagrangian-type simulations)
 real, allocatable :: dtrfc(:,:)! Radiative tendency for pot. temp.
-real, allocatable :: dayrfc(:) ! Radiative forcing arrays time (days) 
+real, allocatable :: dayrfc(:) ! Radiative forcing arrays time (days)
 real, allocatable :: prfc(:,:) ! Pressure/Height
 real, allocatable :: sstsfc(:) ! SSTs
 real, allocatable :: shsfc(:)   ! Sensible heat flux,W/m2
 real, allocatable :: lhsfc(:)  ! Latent heat flux,W/m2
 real, allocatable :: tausfc(:) ! Surface drag,m2/s2
-real, allocatable :: daysfc(:) ! Surface forcing arrays time (days) 
+real, allocatable :: daysfc(:) ! Surface forcing arrays time (days)
 real, allocatable :: usnd(:,:) ! Observed zonal wind
 real, allocatable :: vsnd(:,:) ! Observed meriod wind
 real, allocatable :: tsnd(:,:) ! Observed Abs. temperature
@@ -121,7 +121,7 @@ real, allocatable :: o3snd_mmr(:,:) ! Ozone sounding (mass mixing ratio) input f
 real, allocatable :: zsnd(:,:) ! Height
 real, allocatable :: psnd(:,:) ! Pressure
 real, allocatable :: daysnd(:) ! number of sounding samples
- 
+
 !bloss(2019-10): Aerosol sounding input through IOP netcdf file
 real, allocatable :: AccumAerosolMass_snd(:,:)   ! mass mixing ratio (kg/kg) of accumulation mode aerosol
 real, allocatable :: AccumAerosolNumber_snd(:,:) ! number mixing ratio (#/kg) of accumulation mode aerosol
@@ -171,7 +171,7 @@ real vsfc_xy(nx,ny) ! v-wind at the surface
 real w500_xy(nx,ny) ! w at 500 mb
 real qocean_xy(nx,ny) ! ocean cooling in W/m2
 
-real, parameter :: t00 = 300.   ! constant offset for sstxy 
+real, parameter :: t00 = 300.   ! constant offset for sstxy
 
 !----------------------------------------------------------------------
 !	Vertical profiles of quantities sampled for statitistics purposes:
@@ -189,7 +189,7 @@ real &
     momleadv(nz,3),momlepress(nz,3),momlebuoy(nz,3), &
     momlediff(nz,3),tadv(nz),tdiff(nz),tlat(nz), tlatqi(nz),qifall(nz),qpfall(nz)
 
-! scalar statistics output in *.stat file.  
+! scalar statistics output in *.stat file.
 !    ISCCP, MODIS, MISR statistics only produced if simulator is enabled in PARAMETERS namelist
 real :: &
      w_max = 0., u_max = 0., s_acld = 0., s_acldcold = 0., s_ar = 0., s_arthr = 0., s_sst = 0., &
@@ -212,7 +212,7 @@ real :: &
 !        integer, external :: lenstr, bytes_in_rec
 
 ! energy conservation diagnostics:
- 
+
   real(8) total_water_before, total_water_after
   real(8) total_water_evap, total_water_prec, total_water_ls
 
@@ -257,6 +257,14 @@ real swvp_xy(nx,ny)  ! saturated water vapor path (wrt water)
 
 ! Cloud and echo top heights, and cloud top temperature (instantaneous)
 real cloudtopheight(nx,ny), echotopheight(nx,ny), cloudtoptemp(nx,ny)
+
+! WTG am coefficient, for gradual WTG implementation from RCE to full damping state
+! (added by Nathanael Wong on 2021/01/17)
+real twtg
+real twtgmax
+real am_wtg_c
+real am_wtg_coef
+real :: am_wtg_time = 1024
 
 logical :: IsInitializedRestartFilename = .false.
 CHARACTER(LEN=256) :: RestartFilename, RestartFilenameSave

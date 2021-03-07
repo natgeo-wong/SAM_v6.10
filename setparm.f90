@@ -1,6 +1,6 @@
-	
+
 subroutine setparm
-	
+
 !       initialize parameters:
 
 use vars
@@ -11,7 +11,7 @@ use sgs, only: sgs_setparm
 use movies, only : irecc
 use instrument_diagnostics, only: zero_instr_diag
 implicit none
-	
+
 integer icondavg, ierr, ios, ios_missing_namelist, place_holder
 
 NAMELIST /PARAMETERS/ dodamping, doupperbound, docloud, doprecip, &
@@ -31,7 +31,7 @@ NAMELIST /PARAMETERS/ dodamping, doupperbound, docloud, doprecip, &
 		timelargescale, longitude0, latitude0, day0, nrad, &
 		CEM,LES,OCEAN,LAND,SFC_FLX_FXD,SFC_TAU_FXD, soil_wetness, &
                 doensemble, nensemble, dowallx, dowally, &
-                nsave2D, nsave2Dstart, nsave2Dend, qnsave3D, & 
+                nsave2D, nsave2Dstart, nsave2Dend, qnsave3D, &
                 docolumn, save2Dbin, save2Davg, save3Dbin, &
                 save2Dsep, save3Dsep, dogzip2D, dogzip3D, restart_sep, &
 	        doseasons, doperpetual, doradhomo, dosfchomo, doisccp, &
@@ -51,7 +51,7 @@ NAMELIST /PARAMETERS/ dodamping, doupperbound, docloud, doprecip, &
                 ncycle_max, ncycle_min, ncycle0, cfl_safety_factor, &
                 do_chunked_energy_budgets, do_chunked_momentum_budgets, &
                 nchunk_x_gl, nchunk_y_gl, nsaveMSE
-	
+
 NAMELIST /UWOPTIONS/ rad_simple_fluxdiv1, &
      rad_simple_fluxdiv2, rad_simple_kappa, &
      dofixdivg, do_linear_subsidence, divg_ls, divg_lapse, &
@@ -61,7 +61,7 @@ NAMELIST /UWOPTIONS/ rad_simple_fluxdiv1, &
      Derbyshire_RelH_Low, Derbyshire_RelH_High, &
      Derbyshire_theta0, Derbyshire_LapseRate, &
      Derbyshire_tau, compute_advection_everywhere, &
-     dowtg_blossey_etal_JAMES2009, &
+     dowtg_blossey_etal_JAMES2009, twtg_scale, &
      dowtg_qnudge, itau_wtg_qnudge, &
      dowtg_tnudge, itau_wtg_tnudge,  taulz_wtg_tnudge, &
      tauz0_wtg_qnudge, taulz_wtg_qnudge, &
@@ -69,7 +69,7 @@ NAMELIST /UWOPTIONS/ rad_simple_fluxdiv1, &
      doSmoothDamping, zbot_SmoothDamping, tau_SmoothDamping, &
      doenforce_cgils_qfloor, ztop_qfloor, qfloor, tau_qfloor
 
-     
+
 
 
 !bloss: Create dummy namelist, so that we can figure out error code
@@ -81,7 +81,7 @@ NAMELIST /BNCUIODSBJCB/ place_holder
 !  Read namelist variables from the standard input:
 !------------
 
-open(55,file='./'//trim(case)//'/prm', status='old',form='formatted') 
+open(55,file='./'//trim(case)//'/prm', status='old',form='formatted')
 read (55,PARAMETERS,IOSTAT=ierr)
 if (ierr.ne.0) then
   ! try to get a more useful error message
@@ -97,7 +97,7 @@ close(55)
 !----------------------------------
 !  Read namelist for uw options from same prm file:
 !------------
-open(55,file='./'//trim(case)//'/prm', status='old',form='formatted') 
+open(55,file='./'//trim(case)//'/prm', status='old',form='formatted')
 
 !bloss: get error code for missing namelist (by giving the name for
 !       a namelist that doesn't exist in the prm file).
@@ -131,12 +131,12 @@ if(masterproc) then
             form='formatted', position='append')
       write (55,nml=PARAMETERS)
       write (55,nml=UWOPTIONS)
-      write(55,*) 
+      write(55,*)
       close(55)
 end if
 
 !------------------------------------
-!  Set parameters 
+!  Set parameters
 
 
         ! Allow only special cases for separate output:
@@ -163,20 +163,20 @@ end if
 	notopened2D = .true.
 	notopened3D = .true.
 
-        call zero_instr_diag() ! initialize instruments output 
+        call zero_instr_diag() ! initialize instruments output
         call sgs_setparm() ! read in SGS options from prm file.
         call micro_setparm() ! read in microphysical options from prm file.
 
         if(dosmoke) then
            epsv=0.
-        else    
+        else
            epsv=0.61
-        endif   
+        endif
 
         if((nstatmomend.gt.nstatmomstart).AND.(nstop.ge.nstatmomstart)) then
-          ! if moment statistics will be produced, check to make sure that 
+          ! if moment statistics will be produced, check to make sure that
           !   navgmom_x and _y are set properly.
-          if(navgmom_x.lt.0.or.navgmom_y.lt.0) then  
+          if(navgmom_x.lt.0.or.navgmom_y.lt.0) then
             if(masterproc) then
               write(*,*) ' ******* ERROR in statmom specifications ******'
               write(*,*) 'Moment statistics will not be produced unless'
@@ -194,7 +194,7 @@ end if
 
 
         if(tautqls.eq.99999999.) tautqls = tauls
-          
+
         !===============================================================
         ! UW ADDITION
 
@@ -216,8 +216,8 @@ end if
           call task_barrier()
           call task_abort()
         end if
-            
-            
+
+
 
         !bloss: set up conditional averages
         ncondavg = 1 ! always output CLD conditional average
@@ -236,7 +236,7 @@ end if
              write(*,*) 'ERROR: Could not allocate arrays for conditional statistics in setparm.f90'
              call task_abort()
         end if
-        
+
         ! indicators that can be used to tell whether a particular average
         !   is present.  If >0, these give the index into the condavg arrays
         !   where this particular conditional average appears.
@@ -264,7 +264,7 @@ end if
            condavglongname(icondavg) = 'downdraft core'
            icondavg_cordn = icondavg
         end if
-           
+
         if(dosatupdnconditionals) then
            icondavg = icondavg + 1
            condavgname(icondavg) = 'SUP'
@@ -281,7 +281,7 @@ end if
            condavglongname(icondavg) = 'unsaturated environment'
            icondavg_env = icondavg
         end if
-           
+
         ! END UW ADDITIONS
         !===============================================================
 

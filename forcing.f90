@@ -1,6 +1,6 @@
 
 subroutine forcing
-	
+
 use vars
 use params
 use microphysics, only: micro_field, index_water_vapor, total_water, is_water_vapor, nmicro_fields, mk0, mklsadv, mk_ref
@@ -48,7 +48,7 @@ call t_startf ('forcing')
   end do
 
   do n=1,2
-  
+
     m = nn+n-1
     if(zsnd(2,m).gt.zsnd(1,m)) then
       zgrid=.true.
@@ -62,7 +62,7 @@ call t_startf ('forcing')
       if(zgrid) then
         do i = 2,nzsnd
           if(z(iz).le.zsnd(i,m)) then
-           coef = (z(iz)-zsnd(i-1,m))/(zsnd(i,m)-zsnd(i-1,m)) 
+           coef = (z(iz)-zsnd(i-1,m))/(zsnd(i,m)-zsnd(i-1,m))
            tt(iz,n)=tsnd(i-1,m)+(tsnd(i,m)-tsnd(i-1,m))*coef
            tt(iz,n) = tt(iz,n) / prespot(iz)
            qq(iz,n)=qsnd(i-1,m)+(qsnd(i,m)-qsnd(i-1,m))*coef
@@ -96,7 +96,7 @@ call t_startf ('forcing')
 
    11 continue
 
-    end do ! iz 
+    end do ! iz
 
   end do ! n
 
@@ -201,7 +201,7 @@ if(dolargescale.and.time.gt.timelargescale) then
                  max(0.,micro_field(i,j,k,index_water_vapor) + qtend(k) * dtn)
      end do
     end do
-   end do 
+   end do
 
    pres0 = pres0ls(nn)+(pres0ls(nn+1)-pres0ls(nn))*coef
 
@@ -229,8 +229,14 @@ if(dolargescale.and.time.gt.timelargescale) then
 
    if(dowtg_blossey_etal_JAMES2009) then
 
+     twtgmax = (nstop * dt - timelargescale) * twtg_scale
+     twtg = time-timelargescale
+     am_wtg_c = log(am_wtg)/log(2.)/2
+     am_wtg_coef = erf((twtgmax/2 - twtg)/(twtgmax/5)) * (5-am_wtg_c/2) + 5 + am_wtg_c
+     am_wtg_time = 2 ** am_wtg_coef
+
      call wtg_james2009(nzm, 100.*pres, tg0, qg0, tabs0, qv0, qn0+qp0, &
-          fcor, lambda_wtg, am_wtg, am_wtg_exp, w_wtg, ktrop)
+          fcor, lambda_wtg, am_wtg_time, am_wtg_exp, w_wtg, ktrop)
 
      ! convert from omega in Pa/s to wsub in m/s
      w_wtg(1:nzm) = -w_wtg(1:nzm)/rho(1:nzm)/ggr
@@ -241,12 +247,12 @@ if(dolargescale.and.time.gt.timelargescale) then
      dosubsidence = .true.
 
      if(dowtg_tnudge.and.ktrop.lt.nzm-5) then
-       ! nudge temperature to observed sounding, 
+       ! nudge temperature to observed sounding,
        !   ramping up the nudging starting a couple of
        !   kilometers below the tropopause.
        do k = 1,nzm
          tnudge(k) = -(t0(k)+t00-tg0(k)-gamaz(k)) * itau_wtg_tnudge/86400. &
-              *0.5*(1. + erfff( (z(k) - z(ktrop) + taulz_wtg_tnudge)/taulz_wtg_tnudge ) ) 
+              *0.5*(1. + erfff( (z(k) - z(ktrop) + taulz_wtg_tnudge)/taulz_wtg_tnudge ) )
          do j=1,ny
            do i=1,nx
              t(i,j,k)=t(i,j,k)+tnudge(k) * dtn
@@ -263,7 +269,7 @@ if(dolargescale.and.time.gt.timelargescale) then
        !   to a uniform value in the free troposphere.
        do k = 1,nzm
          qnudge(k) = (qg0(k) - q0(k))*itau_wtg_qnudge/86400. &
-              *0.5*(1. + erfff( (z(k) - tauz0_wtg_qnudge)/taulz_wtg_qnudge ) ) 
+              *0.5*(1. + erfff( (z(k) - tauz0_wtg_qnudge)/taulz_wtg_qnudge ) )
          do j=1,ny
            do i=1,nx
              micro_field(i,j,k,index_water_vapor) = &
@@ -275,7 +281,7 @@ if(dolargescale.and.time.gt.timelargescale) then
    end if
 
    mklsadv(:,:) = 0. ! move initialization here
-     
+
    if(doDerbyshire) then
 
      ! initialize tendencies
@@ -334,7 +340,7 @@ if(dolargescale.and.time.gt.timelargescale) then
 !!$             ! if tendency is drying, remove moisture with mean isotopic composition of domain
 !!$             tmp_hadvq(k) = hadvq(k)*mk0(k,n)/mk0(k,index_water_vapor)
 !!$           else
-!!$             ! if tendency is moistening, add moisture with reference isotopic composition 
+!!$             ! if tendency is moistening, add moisture with reference isotopic composition
 !!$             tmp_hadvq(k) = hadvq(k)*mk_ref(k,n)/mk_ref(k,index_water_vapor)
 !!$           end if
          tmp_hadvq(:) = hadvq(:)*mk0(1:nzm,n)/mk0(1:nzm,index_water_vapor)
@@ -353,7 +359,7 @@ if(dolargescale.and.time.gt.timelargescale) then
 
    if(dosubsidence) call subsidence()
 
-end if 
+end if
 
 !---------------------------------------------------------------------
 ! Prescribed Radiation Forcing:
@@ -370,7 +376,7 @@ if(doradforcing.and.time.gt.timelargescale) then
 
   do n=1,2
 
-    m = nn+n-1 
+    m = nn+n-1
 
     if(prfc(2,m).gt.prfc(1,m)) then
      zgrid=.true.
@@ -411,7 +417,7 @@ if(doradforcing.and.time.gt.timelargescale) then
     radqrsw(k)=0.
     do j=1,ny
      do i=1,nx
-       t(i,j,k)=t(i,j,k)+radtend*dtn 
+       t(i,j,k)=t(i,j,k)+radtend*dtn
      end do
     end do
   end do
