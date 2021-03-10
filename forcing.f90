@@ -102,7 +102,9 @@ call t_startf ('forcing')
 
   coef=(day-daysnd(nn))/(daysnd(nn+1)-daysnd(nn))
   do k=1,nzm
-    tg0(k)=tt(k,1)+(tt(k,2)-tt(k,1))*coef
+    if(nstep.eq.1) then
+      tg0(k)=tt(k,1)+(tt(k,2)-tt(k,1))*coef
+    endif
     qg0(k)=qq(k,1)+(qq(k,2)-qq(k,1))*coef
     qg0(k)=qg0(k)*1.e-3
 ! Note that ug0 and vg0 maybe reset if dolargescale is true)
