@@ -17,7 +17,7 @@ real, parameter :: diffelq = 2.21e-05     ! Diffusivity of water vapor, m2/s
 real, parameter :: therco = 2.40e-02      ! Thermal conductivity of air, J/m/s/K
 real, parameter :: muelq = 1.717e-05      ! Dynamic viscosity of air
 
-real, parameter :: fac_cond = lcond/cp 
+real, parameter :: fac_cond = lcond/cp
 real, parameter :: fac_fus = lfus/cp
 real, parameter :: fac_sub = lsub/cp
 
@@ -33,7 +33,7 @@ real coszrs
 real salt_factor ! correction factor for water vapor saturation over sea-water
 
 !bloss: options to allow a larger number of substeps and to keep a margin of safety away from the CFL limit
-integer:: ncycle_max = 4  ! maximum number of subcycling within dt
+integer:: ncycle_max = 50 ! maximum number of subcycling within dt
 integer:: ncycle_min = 1  ! minimum number of subcycling within dt
 integer:: ncycle0 = 1     ! number of subcycles for first timestep of simulation.
 real :: cfl_safety_factor = 1.5  ! ensure that CFL < CFL_stability_limit / cfl_safety_factor
@@ -45,9 +45,9 @@ real :: cfl_safety_factor = 1.5  ! ensure that CFL < CFL_stability_limit / cfl_s
 
 real:: ug = 0.        ! Velocity of the Domain's drift in x direction
 real:: vg	= 0.        ! Velocity of the Domain's drift in y direction
-real:: fcor = -999.   ! Coriolis parameter	
-real:: longitude0 = 0.    ! latitude of the domain's center 
-real:: latitude0  = 0.    ! longitude of the domain's center 
+real:: fcor = -999.   ! Coriolis parameter
+real:: longitude0 = 0.    ! latitude of the domain's center
+real:: latitude0  = 0.    ! longitude of the domain's center
 real:: nxco2 = 1.         ! factor to modify co2 concentration
 logical:: doradlat = .false.
 logical:: doradlon = .false.
@@ -74,7 +74,7 @@ logical:: sfc_tau_fxd =.false.! surface drag is fixed
 
 real:: timelargescale =0. ! time to start large-scale forcing
 
-! nudging boundaries (between z1 and z2, where z2 > z1): 
+! nudging boundaries (between z1 and z2, where z2 > z1):
 real:: nudging_uv_z1 =-1., nudging_uv_z2 = 1000000.
 real:: nudging_t_z1 =-1., nudging_t_z2 = 1000000.
 real:: nudging_q_z1 =-1., nudging_q_z2 = 1000000.
@@ -82,38 +82,38 @@ real:: tauls = 99999999.    ! nudging-to-large-scaler-profile time-scale
 real:: tautqls = 99999999.! nudging-to-large-scaler-profile time-scale for scalars
 
 logical:: dodamping = .false.
-logical:: doupperbound = .false. 
-logical:: docloud = .false. 
+logical:: doupperbound = .false.
+logical:: docloud = .false.
 logical:: doprecip = .false.
-logical:: dolongwave = .false. 
+logical:: dolongwave = .false.
 logical:: doshortwave = .false.
 logical:: dosgs = .false.
-logical:: docoriolis = .false. 
-logical:: docoriolisz = .false. 
+logical:: docoriolis = .false.
+logical:: docoriolisz = .false.
 logical:: dofplane = .true.
-logical:: dosurface = .false. 
-logical:: dolargescale = .false. 
+logical:: dosurface = .false.
+logical:: dolargescale = .false.
 logical:: doradforcing = .false.
-logical:: dosfcforcing = .false. 
-logical:: doradsimple = .false. 
-logical:: donudging_uv = .false. 
+logical:: dosfcforcing = .false.
+logical:: doradsimple = .false.
+logical:: donudging_uv = .false.
 logical:: donudging_tq = .false.
-logical:: donudging_t = .false. 
+logical:: donudging_t = .false.
 logical:: donudging_q = .false.
-logical:: doensemble = .false. 
-logical:: dowallx = .false. 
-logical:: dowally = .false. 
-logical:: docolumn = .false. 
+logical:: doensemble = .false.
+logical:: dowallx = .false.
+logical:: dowally = .false.
+logical:: docolumn = .false.
 logical:: docup = .false.
-logical:: doperpetual = .false. 
-logical:: doseasons = .false. 
-logical:: doradhomo = .false. 
+logical:: doperpetual = .false.
+logical:: doseasons = .false.
+logical:: doradhomo = .false.
 logical:: dosfchomo = .false.
-logical:: dossthomo = .false. 
-logical:: dodynamicocean = .false. 
+logical:: dossthomo = .false.
+logical:: dodynamicocean = .false.
 logical:: dosolarconstant = .false.
-logical:: dotracers = .false. 
-logical:: dosmoke = .false. 
+logical:: dotracers = .false.
+logical:: dosmoke = .false.
 logical:: notracegases = .false.
 logical:: doseawater = .true. !bloss(Set UW default to true!!) .false.
 
@@ -137,7 +137,7 @@ integer:: perturb_type  = 0 ! type of initial noise in setperturb()
   real:: bubble_dq = 0.
 
 ! Option for simple treatment of aerosol radiative effect in RRTMG by Tak Yamaguchi
-logical:: doradaerosimple = .false. 
+logical:: doradaerosimple = .false.
 
 ! Option for writing restart file only at end of simulation
 logical:: dorestart_last_only = .false.
