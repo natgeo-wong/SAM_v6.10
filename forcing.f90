@@ -64,7 +64,7 @@ call t_startf ('forcing')
           if(z(iz).le.zsnd(i,m)) then
            coef = (z(iz)-zsnd(i-1,m))/(zsnd(i,m)-zsnd(i-1,m))
            tt(iz,n)=tsnd(i-1,m)+(tsnd(i,m)-tsnd(i-1,m))*coef
-           tt(iz,n) = tt(iz,n) / prespot(iz)
+           tt(iz,n) = tt(iz,n) / prespoti(iz)
            qq(iz,n)=qsnd(i-1,m)+(qsnd(i,m)-qsnd(i-1,m))*coef
            uu(iz,n)=usnd(i-1,m)+(usnd(i,m)-usnd(i-1,m))*coef
            vv(iz,n)=vsnd(i-1,m)+(vsnd(i,m)-vsnd(i-1,m))*coef
@@ -74,9 +74,9 @@ call t_startf ('forcing')
       else
         do i = 2,nzsnd
           if(pres(iz).ge.psnd(i,m)) then
-           coef = (pres(iz)-psnd(i-1,m))/(psnd(i,m)-psnd(i-1,m))
+           coef = (prespoti(iz)-psnd(i-1,m))/(psnd(i,m)-psnd(i-1,m))
            tt(iz,n)=tsnd(i-1,m)+(tsnd(i,m)-tsnd(i-1,m))*coef
-           tt(iz,n) = tt(iz,n) /prespot(iz)
+           tt(iz,n) = tt(iz,n) / prespoti(iz)
            qq(iz,n)=qsnd(i-1,m)+(qsnd(i,m)-qsnd(i-1,m))*coef
            uu(iz,n)=usnd(i-1,m)+(usnd(i,m)-usnd(i-1,m))*coef
            vv(iz,n)=vsnd(i-1,m)+(vsnd(i,m)-vsnd(i-1,m))*coef
@@ -102,9 +102,7 @@ call t_startf ('forcing')
 
   coef=(day-daysnd(nn))/(daysnd(nn+1)-daysnd(nn))
   do k=1,nzm
-    if(nstep.eq.1) then
-      tg0(k)=tt(k,1)+(tt(k,2)-tt(k,1))*coef
-    endif
+    tg0(k)=tt(k,1)+(tt(k,2)-tt(k,1))*coef
     qg0(k)=qq(k,1)+(qq(k,2)-qq(k,1))*coef
     qg0(k)=qg0(k)*1.e-3
 ! Note that ug0 and vg0 maybe reset if dolargescale is true)

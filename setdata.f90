@@ -1,5 +1,5 @@
 subroutine setdata()
-	
+
 use vars
 use params
 !use micro_params
@@ -8,12 +8,12 @@ use microphysics, only: micro_init, micro_proc
 use sgs, only: sgs_init, sgs_proc
 use mse, only: initializeMSE
 implicit none
-	
+
 integer ndmax,n,i,j,k,kb,iz,it,jt
-real presr(nz), qc0(nzm),qi0(nzm)	
+real presr(nz), qc0(nzm),qi0(nzm)
 parameter (ndmax = 1000)
-real zz(ndmax),tt(ndmax),qq(ndmax),uu(ndmax),vv(ndmax) 
-real zz1(ndmax),tt1(ndmax),qq1(ndmax),uu1(ndmax),vv1(ndmax) 
+real zz(ndmax),tt(ndmax),qq(ndmax),uu(ndmax),vv(ndmax)
+real zz1(ndmax),tt1(ndmax),qq1(ndmax),uu1(ndmax),vv1(ndmax)
 real rrr1,rrr2, pres1, pp(ndmax),ta(ndmax)
 real pp1(ndmax)
 real ratio_t1,ratio_t2,ratio_p1,ratio_p2
@@ -32,8 +32,8 @@ real :: tmp_pres(nzm)
 !	read subensemble perturbation file first:
 
 if(doensemble) then
-	
-open(76,file=trim(rundatadir)//'/tqpert',status='old',form='formatted')  
+
+open(76,file=trim(rundatadir)//'/tqpert',status='old',form='formatted')
 read(76,*)
   do j=0,nensemble
     read(76,*) i,n
@@ -49,7 +49,7 @@ read(76,*)
     print*,'qpert:',(qpert0(i),i=1,n)
   end if
   goto 767
-766  print*,'Error: nensemble is too large.'  
+766  print*,'Error: nensemble is too large.'
   call task_abort()
 767  continue
 else
@@ -141,11 +141,11 @@ do while(.true.)
   read(77,err=55,end=55,fmt=*) rrr1, n, pres0
   do i=1,n
       read(77,*) zz(i),pp(i),tt(i),qq(i),uu(i),vv(i)
-  end do	      
+  end do
   read(77,err=55,end=55,fmt=*) rrr2, n, pres1
   do i=1,n
       read(77,*) zz1(i),pp1(i),tt1(i),qq1(i),uu1(i),vv1(i)
-  end do	      
+  end do
 
   if(day.ge.rrr1.and.day.le.rrr2) then
     if(zz(2).gt.zz(1)) then
@@ -156,8 +156,6 @@ do while(.true.)
       qq(i)=qq(i)+(qq1(i)-qq(i))/(rrr2-rrr1+1.e-5)*(day-rrr1)
       uu(i)=uu(i)+(uu1(i)-uu(i))/(rrr2-rrr1+1.e-5)*(day-rrr1)
       vv(i)=vv(i)+(vv1(i)-vv(i))/(rrr2-rrr1+1.e-5)*(day-rrr1)
-      tt(i)=tt(i)+tpert0(i)
-      qq(i)=qq(i)+qpert0(i) 
       end do
     else if(pp(2).lt.pp(1)) then
       zgrid = .false.
@@ -167,21 +165,19 @@ do while(.true.)
       qq(i)=qq(i)+(qq1(i)-qq(i))/(rrr2-rrr1+1.e-5)*(day-rrr1)
       uu(i)=uu(i)+(uu1(i)-uu(i))/(rrr2-rrr1+1.e-5)*(day-rrr1)
       vv(i)=vv(i)+(vv1(i)-vv(i))/(rrr2-rrr1+1.e-5)*(day-rrr1)
-      tt(i)=tt(i)+tpert0(i)
-      qq(i)=qq(i)+qpert0(i) 
       ta(i)=tt(i)*(pp(i)/1000.)**(rgas/cp)
       end do
-    else  
+    else
       if(masterproc) print*,'vertical grid is undefined...'
     end if
-    pres0=pres0+(pres1-pres0)/(rrr2-rrr1+1.e-5)*(day-rrr1)      
+    pres0=pres0+(pres1-pres0)/(rrr2-rrr1+1.e-5)*(day-rrr1)
     goto 56
   endif
   do i=1,n+1
     backspace(77)
-!    backspace(77) ! these two lines were addedf because of 
+!    backspace(77) ! these two lines were addedf because of
 !    read(77)      ! a bug in gfortran compiler
-  end do	      
+  end do
 
 end do
 
@@ -191,16 +187,16 @@ if(masterproc) then
   print*,day,rrr1,rrr2
 end if
 call task_abort()
-56 continue	
+56 continue
 
 close (77)
 
 end if ! if(doscamiopdata)
 
 if(masterproc) then
-  print *	
+  print *
   print *,'surface pressure: ',pres0
-endif  
+endif
 
 ! compute heights from pressure:
 
@@ -209,7 +205,7 @@ if(.not.zgrid) then
  do i=2,n
   zz(i)=zz(i-1)+0.5*rgas/ggr*(ta(i)+ta(i-1))*log(pp(i-1)/pp(i))
  end do
-end if  	
+end if
 !-----------------------------------------------------------
 !       Interpolate sounding into vertical grid:
 
@@ -218,10 +214,10 @@ presi(1)=pres0
 do k= 1,nzm
  do iz = 2,n
   if(z(k).le.zz(iz)) then
-    t0(k)=tt(iz-1)+(tt(iz)-tt(iz-1))/(zz(iz)-zz(iz-1))*(z(k)-zz(iz-1))	
+    t0(k)=tt(iz-1)+(tt(iz)-tt(iz-1))/(zz(iz)-zz(iz-1))*(z(k)-zz(iz-1))
     q0(k)=qq(iz-1)+(qq(iz)-qq(iz-1))/(zz(iz)-zz(iz-1))*(z(k)-zz(iz-1))
-    u0(k)=uu(iz-1)+(uu(iz)-uu(iz-1))/(zz(iz)-zz(iz-1))*(z(k)-zz(iz-1))  
-    v0(k)=vv(iz-1)+(vv(iz)-vv(iz-1))/(zz(iz)-zz(iz-1))*(z(k)-zz(iz-1)) 
+    u0(k)=uu(iz-1)+(uu(iz)-uu(iz-1))/(zz(iz)-zz(iz-1))*(z(k)-zz(iz-1))
+    v0(k)=vv(iz-1)+(vv(iz)-vv(iz-1))/(zz(iz)-zz(iz-1))*(z(k)-zz(iz-1))
     goto 12
   endif
  end do
@@ -249,25 +245,24 @@ do k= 1,nzm
  pres(k) = exp(log(presi(k))+log(presi(k+1)/presi(k))* &
                              (z(k)-zi(k))/(zi(k+1)-zi(k)))
  prespot(k)=(1000./pres(k))**(rgas/cp)
- tabs0(k)=t0(k)/prespot(k)
+ tabs0(k)=(t0(k)+tpert0(k))/prespot(k)
 13 continue
  ug0(k)=u0(k)
  vg0(k)=v0(k)
 end do
 
-
 ! recompute pressure levels (for consistancy):
 
 !	call pressz()
-        
+
 !-------------------------------------------------------------
-!       Initial thernodynamic profiles: 
-	
+!       Initial thernodynamic profiles:
+
 do k=1,nzm
 
   gamaz(k)=ggr/cp*z(k)
-  t0(k) = tabs0(k)+gamaz(k) 
-  qv0(k) = q0(k)
+  t0(k) = tabs0(k)+gamaz(k)
+  qv0(k) = q0(k)+qpert0(k)
   qc0(k) = 0.
   qi0(k) = 0.
   qn0(k) = 0.
@@ -276,11 +271,13 @@ do k=1,nzm
 
   rho(k) = (presi(k)-presi(k+1))/(zi(k+1)-zi(k))/ggr*100.
   bet(k) = ggr/tabs0(k)
- 
+
   u0(k) = u0(k) - ug
   v0(k) = v0(k) - vg
   ug0(k) = ug0(k) - ug
   vg0(k) = vg0(k) - vg
+
+  prespoti(k) = prespot(k)
 
 end do
 
@@ -327,8 +324,8 @@ if(use_scam_reference_sounding.OR.use_scam_initial_sounding) then
     do k= 1,nzm
       do iz = 2,nzsnd
         if(z(k).gt.zz(iz)) then
-          tmp_pres(k)=pp(iz-1)+(pp(iz)-pp(iz-1))/(zz(iz)-zz(iz-1))*(z(k)-zz(iz-1))	
-          t0(k)=tt(iz-1)+(tt(iz)-tt(iz-1))/(zz(iz)-zz(iz-1))*(z(k)-zz(iz-1))	
+          tmp_pres(k)=pp(iz-1)+(pp(iz)-pp(iz-1))/(zz(iz)-zz(iz-1))*(z(k)-zz(iz-1))
+          t0(k)=tt(iz-1)+(tt(iz)-tt(iz-1))/(zz(iz)-zz(iz-1))*(z(k)-zz(iz-1))
           q0(k)=qq(iz-1)+(qq(iz)-qq(iz-1))/(zz(iz)-zz(iz-1))*(z(k)-zz(iz-1))
           EXIT
         endif
@@ -347,7 +344,7 @@ if(use_scam_reference_sounding.OR.use_scam_initial_sounding) then
     do k= 1,nzm
       do iz = 2,nzsnd
         if(pres(k).gt.pp(iz)) then
-          t0(k)=tt(iz-1)+(tt(iz)-tt(iz-1))/(pp(iz)-pp(iz-1))*(pres(k)-pp(iz-1))	
+          t0(k)=tt(iz-1)+(tt(iz)-tt(iz-1))/(pp(iz)-pp(iz-1))*(pres(k)-pp(iz-1))
           q0(k)=qq(iz-1)+(qq(iz)-qq(iz-1))/(pp(iz)-pp(iz-1))*(pres(k)-pp(iz-1))
           EXIT
         endif
@@ -369,7 +366,7 @@ if(use_scam_reference_sounding.OR.use_scam_initial_sounding) then
    ! set "observed" temperature and humidity to values from the
    ! reference sounding.  These values will be output in TABSOBS and
    ! QVOBS and will be used for nudging and WTG (if they are enabled).
-   
+
    !  This might be useful in a WTG framework where the reference
    !  sounding might provide a good background sounding.
    tsnd(:,:) = tsnd_ref(:,:)
@@ -402,14 +399,14 @@ do k=1,nzm
    fluxtq(i,j)=0.
    precsfc(i,j)=0.
    sstxy(i,j)=0.
-  end do 
- end do 
-end do 
+  end do
+ end do
+end do
 
 dudt = 0.
 dvdt = 0.
-dwdt = 0.	   
-	
+dwdt = 0.
+
 if(docloud.or.dosmoke) call micro_init()  !initialize microphysics
 
 do k=1,nzm
@@ -429,19 +426,19 @@ if(masterproc) then
    write(6,'(i4,1x,f7.1,2f7.3,f7.2,f7.2,4f7.2,5g11.4)') k,z(k),rho(k),rhow(k),tabs0(k)+gamaz(k), &
           t0(k)+lcond/cp*qv0(k), t0(k)+lcond/cp*qsatw(tabs0(k),pres(k)), &
 		q0(k)*1.e3,u0(k)+ug,v0(k)+vg, adz(k),bet(k)*(t0(k)-t0(kb))/(adzw(k)*dz)
- end do  
+ end do
  print *, ' k      z    rho     rhoi    s      h     h*      qt      u      v     adz     Nsq'
 
- print *  
- print *,'  k      z      dz     pres   presi   Tabs     tp     tpl      qt      Qc      Qi      REL' 
+ print *
+ print *,'  k      z      dz     pres   presi   Tabs     tp     tpl      qt      Qc      Qi      REL'
  coef=1.
  if(dosmoke) coef = 0.
  do k = nzm,1,-1
   write(6,'(i4,1x,7f8.2,3f8.4,f8.2)')   k,z(k),zi(k+1)-zi(k),pres(k),presi(k),tabs0(k), &
      tabs0(k)*prespot(k),tabs0(k)*prespot(k)-lcond/cp*qc0(k),q0(k)*1.e3, qc0(k)*1.e3,qi0(k)*1.e3, &
-     coef*100.*qv0(k)/qsatw(tabs0(k),pres(k)) 
+     coef*100.*qv0(k)/qsatw(tabs0(k),pres(k))
  end do
- print *,'  k      z      dz     pres   presi   Tabs     tp     tpl      qt      Qc      Qi      REL' 
+ print *,'  k      z      dz     pres   presi   Tabs     tp     tpl      qt      Qc      Qi      REL'
 endif
 
 if(dosgs) call sgs_init()
@@ -458,4 +455,3 @@ call boundaries(4)
 
 
 end
-
