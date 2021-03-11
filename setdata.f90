@@ -277,6 +277,8 @@ do k=1,nzm
   ug0(k) = ug0(k) - ug
   vg0(k) = vg0(k) - vg
 
+  prespoti(k) = prespot(k)
+
 end do
 
 do k=2,nzm

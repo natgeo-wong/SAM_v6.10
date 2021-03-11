@@ -69,6 +69,7 @@ real   gamq0    ! gradient of q() at the top,g/g/m
 ! reference vertical profiles:
 
 real   prespot(nzm)  ! (1000./pres)**R/cp
+real   prespoti(nzm) ! initial prespot, to convert pottemp soundings to temp for LS forcing
 real   rho(nzm)	  ! air density at pressure levels,kg/m3
 real   rhow(nz)   ! air density at vertical velocity levels,kg/m3
 real   bet(nzm)	  ! = ggr/tv0
