@@ -74,7 +74,7 @@ call t_startf ('forcing')
       else
         do i = 2,nzsnd
           if(pres(iz).ge.psnd(i,m)) then
-           coef = (pres(iz)-psnd(i-1,m))/(psnd(i,m)-psnd(i-1,m))
+           coef = (prespoti(iz)-psnd(i-1,m))/(psnd(i,m)-psnd(i-1,m))
            tt(iz,n)=tsnd(i-1,m)+(tsnd(i,m)-tsnd(i-1,m))*coef
            tt(iz,n) = tt(iz,n) / prespoti(iz)
            qq(iz,n)=qsnd(i-1,m)+(qsnd(i,m)-qsnd(i-1,m))*coef
