@@ -64,7 +64,7 @@ call t_startf ('forcing')
           if(z(iz).le.zsnd(i,m)) then
            coef = (z(iz)-zsnd(i-1,m))/(zsnd(i,m)-zsnd(i-1,m))
            tt(iz,n)=tsnd(i-1,m)+(tsnd(i,m)-tsnd(i-1,m))*coef
-           tt(iz,n) = tt(iz,n) / prespoti(iz)
+           tt(iz,n)=tt(iz,n)/prespoti(iz)
            qq(iz,n)=qsnd(i-1,m)+(qsnd(i,m)-qsnd(i-1,m))*coef
            uu(iz,n)=usnd(i-1,m)+(usnd(i,m)-usnd(i-1,m))*coef
            vv(iz,n)=vsnd(i-1,m)+(vsnd(i,m)-vsnd(i-1,m))*coef
@@ -73,10 +73,10 @@ call t_startf ('forcing')
         end do
       else
         do i = 2,nzsnd
-          if(pres(iz).ge.psnd(i,m)) then
+          if(prespoti(iz).ge.psnd(i,m)) then
            coef = (prespoti(iz)-psnd(i-1,m))/(psnd(i,m)-psnd(i-1,m))
            tt(iz,n)=tsnd(i-1,m)+(tsnd(i,m)-tsnd(i-1,m))*coef
-           tt(iz,n) = tt(iz,n) / prespoti(iz)
+           tt(iz,n)=tt(iz,n)/prespoti(iz)
            qq(iz,n)=qsnd(i-1,m)+(qsnd(i,m)-qsnd(i-1,m))*coef
            uu(iz,n)=usnd(i-1,m)+(usnd(i,m)-usnd(i-1,m))*coef
            vv(iz,n)=vsnd(i-1,m)+(vsnd(i,m)-vsnd(i-1,m))*coef
