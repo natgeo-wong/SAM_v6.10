@@ -247,7 +247,7 @@ if(dolargescale.and.time.gt.timelargescale) then
        twtgmax = (nstop * dt - timelargescale) * twtg_scale
        twtg = time-timelargescale
        am_wtg_c = log(am_wtg)/log(2.)/2
-       am_wtg_coef = erf((twtgmax/2 - twtg)/(twtgmax/5)) * (5-am_wtg_c/2) + 5 + am_wtg_c
+       am_wtg_coef = erf((twtgmax/2 - twtg)/(twtgmax/5)) * (5-am_wtg_c) + 5 + am_wtg_c
        am_wtg_time = 2 ** am_wtg_coef
      else
        am_wtg_time = am_wtg
