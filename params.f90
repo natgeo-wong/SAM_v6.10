@@ -116,6 +116,7 @@ logical:: dotracers = .false.
 logical:: dosmoke = .false.
 logical:: notracegases = .false.
 logical:: doseawater = .true. !bloss(Set UW default to true!!) .false.
+logical:: doradtendency = .false. ! Radiative tendencies as per Pauluis & Garner [2006]
 
 ! Specify solar constant and zenith angle for perpetual insolation.
 ! Based onn Tompkins and Graig (1998)

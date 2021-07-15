@@ -17,27 +17,27 @@ integer icondavg, ierr, ios, ios_missing_namelist, place_holder
 NAMELIST /PARAMETERS/ dodamping, doupperbound, docloud, doprecip, &
                 dolongwave, doshortwave, dosgs, dz, doconstdz, &
                 docoriolis, docoriolisz, dosurface, dolargescale, doradforcing, &
-		fluxt0,fluxq0,tau0,tabs_s,z0,nelapse, dt, dx, dy,  &
+								fluxt0,fluxq0,tau0,tabs_s,z0,nelapse, dt, dx, dy,  &
                 fcor, ug, vg, nstop, caseid, case_restart,caseid_restart, &
-		nstat, nstatfrq, nprint, nrestart, doradsimple, &
-		nsave3D, nsave3Dstart, nsave3Dend, dosfcforcing, &
-		donudging_uv, donudging_tq, &
+								nstat, nstatfrq, nprint, nrestart, doradsimple, doradtendency, &
+								nsave3D, nsave3Dstart, nsave3Dend, dosfcforcing, &
+								donudging_uv, donudging_tq, &
                 donudging_t, donudging_q, tauls,tautqls,&
                 nudging_uv_z1, nudging_uv_z2, nudging_t_z1, nudging_t_z2, &
                 nudging_q_z1, nudging_q_z2, dofplane, &
                 dovariable_tauz,  variable_tauz_offset_above_inversion, & !bloss(2019-10)
                 variable_tauz_thickness_of_onset, variable_tauz_minimum_height, & !bloss(2019-10)
                 nudging_t_zramp, nudging_q_zramp, & !bloss(2019-10)
-		timelargescale, longitude0, latitude0, day0, nrad, &
-		CEM,LES,OCEAN,LAND,SFC_FLX_FXD,SFC_TAU_FXD, soil_wetness, &
+								timelargescale, longitude0, latitude0, day0, nrad, &
+								CEM,LES,OCEAN,LAND,SFC_FLX_FXD,SFC_TAU_FXD, soil_wetness, &
                 doensemble, nensemble, dowallx, dowally, &
                 nsave2D, nsave2Dstart, nsave2Dend, qnsave3D, &
                 docolumn, save2Dbin, save2Davg, save3Dbin, &
                 save2Dsep, save3Dsep, dogzip2D, dogzip3D, restart_sep, &
-	        doseasons, doperpetual, doradhomo, dosfchomo, doisccp, &
+	        			doseasons, doperpetual, doradhomo, dosfchomo, doisccp, &
                 domodis, domisr, dodynamicocean, ocean_type, delta_sst, &
                 depth_slab_ocean, Szero, deltaS, timesimpleocean, &
-		dosolarconstant, solar_constant, zenith_angle, rundatadir, &
+								dosolarconstant, solar_constant, zenith_angle, rundatadir, &
                 dotracers, output_sep, perturb_type, &
                 doSAMconditionals, dosatupdnconditionals, &
                 doscamiopdata, iopfile, dozero_out_day0, &

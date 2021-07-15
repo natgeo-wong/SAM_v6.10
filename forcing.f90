@@ -478,6 +478,26 @@ if(dosfcforcing.and.time.gt.timelargescale) then
 
 endif
 
+!----------------------------------------------------------------------------
+! Temperature Tendency Forcing:
+!	Simple Radiative Tendencies taken from Pauluis & Garner [2006]
+
+if(doradtendency.and.time.gt.timelargescale) then
+
+  do k = 1,nzm
+    do j=1,ny
+      do i=1,nx
+        if (t(i,j,k)>207.5) then
+            t(i,j,k) = t(i,j,k) - dtn * 1.5 / 86400
+        else
+            t(i,j,k) = t(i,j,k) + dtn * (200 - tabs(i,j,k)) / (5*86400)
+        end if
+      end do
+    end do
+  end do
+
+endif
+
 !-------------------------------------------------------------------------------
 
 if(.not.dosfcforcing.and.dodynamicocean) then
