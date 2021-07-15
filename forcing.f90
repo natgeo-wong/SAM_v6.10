@@ -487,7 +487,7 @@ if(doradtendency.and.time.gt.timelargescale) then
   do k = 1,nzm
     do j=1,ny
       do i=1,nx
-        if (t(i,j,k)>207.5) then
+        if (tabs(i,j,k)>207.5) then
             t(i,j,k) = t(i,j,k) - dtn * 1.5 / 86400
         else
             t(i,j,k) = t(i,j,k) + dtn * (200 - tabs(i,j,k)) / (5*86400)
