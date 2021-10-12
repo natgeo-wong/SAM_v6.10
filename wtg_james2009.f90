@@ -188,7 +188,7 @@ contains
     else
       ! apply omega=0 boundary condition at the tropopause.
       short_domain = .false.
-      if ktrop.gt.(nzm-5) then
+      if (ktrop.gt.(nzm-5)) then
         min_temp = tabs_model(1) 
         do k = 1,nzm
           if((tabs_model(k).lt.min_temp).AND.(pres(k).gt.pres_trop)) then
