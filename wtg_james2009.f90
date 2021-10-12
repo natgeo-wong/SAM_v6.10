@@ -186,9 +186,7 @@ contains
       !   the top of the model and the tropopause.
       short_domain = .true.
       ktrop = nzm+nzextra 
-      if(masterproc) then
-        write(*,*) 'wtg_james2009 - short domain detected, adding 21 extra levels'
-      end if
+      print*,'wtg_james2009 - short domain detected, adding 21 extra levels'
     else
       ! apply omega=0 boundary condition at the tropopause.
       short_domain = .false.
@@ -203,10 +201,7 @@ contains
       ! extend pressure sounding to tropopause (default=100hPa).
       !   make pressure grid spacing continuous at model top.
       dp_top = presi(nzm+1) - presi(nzm)
-
-      if(masterproc) then
-        write(*,*) 'wtg_james2009 - dp_top: ' dp_top
-      end if
+      print*,'wtg_james2009 - dp_top: ',dp_top
 
       if(presi(nzm+1)+float(nzextra-1)*dp_top.LT.pres_trop) then
         ! if uniformly-spaced pressure grid will reach tropopause,
@@ -228,10 +223,7 @@ contains
           !   since tropopause has been reached.
           presi(nzm+k) = pres_trop
           ktrop = nzm+k
-
-          if(masterproc) then
-            write(*,*) 'wtg_james2009 - ktrop: ' ktrop
-          end if
+          print*,'wtg_james2009 - ktrop: ',ktrop
           EXIT
         end if
       end do
