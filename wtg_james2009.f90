@@ -179,9 +179,7 @@ contains
 
     ! check whether the model top is much below the likely location of
     ! the tropopause (~100-150 hPa).
-    if((ktrop.gt.nzm-5) & ! min temperature is close to model top
-         .OR.(presc(nzm).gt.2.e4) & ! model top has p>200hPa
-         ) then
+    if(presc(nzm).gt.pres_trop) then ! model top has p>100hPa
       ! Add extra levels (default=20) to solve for omega between
       !   the top of the model and the tropopause.
       short_domain = .true.
@@ -190,6 +188,17 @@ contains
     else
       ! apply omega=0 boundary condition at the tropopause.
       short_domain = .false.
+      if ktrop.gt.(nzm-5) then
+        min_temp = tabs_model(1) 
+        do k = 1,nzm
+          if((tabs_model(k).lt.min_temp).AND.(pres(k).gt.pres_trop)) then
+            ktrop = k
+            min_temp = tabs_model(k)
+          end if
+        end do
+      end if
+      print*,'wtg_james2009 - tall domain ktrop: ',ktrop
+      print*,'wtg_james2009 - tall domain min_temp: ',min_temp
     end if
 
     ! compute pressure at interfaces up to model top
@@ -223,7 +232,7 @@ contains
           !   since tropopause has been reached.
           presi(nzm+k) = pres_trop
           ktrop = nzm+k
-          print*,'wtg_james2009 - ktrop: ',ktrop
+          print*,'wtg_james2009 - short domain ktrop: ',ktrop
           EXIT
         end if
       end do
