@@ -234,6 +234,8 @@ contains
            0.5*(presi(nzm+1:ktrop-1)+presi(nzm+2:ktrop))
     end if
 
+    print*,'wtg_james2009 - presi: ',presi
+
     !bloss: WTG based on Appendix of Blossey, Bretherton & Wyant, JAMES 2009.
 
     ! with this method, a second-order differential equation is
