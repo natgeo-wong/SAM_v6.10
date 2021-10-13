@@ -179,16 +179,26 @@ contains
 
     ! check whether the model top is much below the likely location of
     ! the tropopause (~100-150 hPa).
-    if((ktrop.gt.nzm-5) & ! min temperature is close to model top
-         .OR.(presc(nzm).gt.2.e4) & ! model top has p>200hPa
-         ) then
+    if(presc(nzm).gt.pres_trop) then ! model top has p>100hPa
       ! Add extra levels (default=20) to solve for omega between
       !   the top of the model and the tropopause.
       short_domain = .true.
       ktrop = nzm+nzextra 
+      ! print*,'wtg_james2009 - short domain detected, adding 21 extra levels'
     else
       ! apply omega=0 boundary condition at the tropopause.
       short_domain = .false.
+      if (ktrop.gt.(nzm-5)) then
+        min_temp = tabs_model(1) 
+        do k = 1,nzm
+          if((tabs_model(k).lt.min_temp).AND.(pres(k).gt.pres_trop)) then
+            ktrop = k
+            min_temp = tabs_model(k)
+          end if
+        end do
+      end if
+      ! print*,'wtg_james2009 - tall domain ktrop: ',ktrop
+      ! print*,'wtg_james2009 - tall domain min_temp: ',min_temp
     end if
 
     ! compute pressure at interfaces up to model top
@@ -200,6 +210,7 @@ contains
       ! extend pressure sounding to tropopause (default=100hPa).
       !   make pressure grid spacing continuous at model top.
       dp_top = presi(nzm+1) - presi(nzm)
+      ! print*,'wtg_james2009 - dp_top: ',dp_top
 
       if(presi(nzm+1)+float(nzextra-1)*dp_top.LT.pres_trop) then
         ! if uniformly-spaced pressure grid will reach tropopause,
@@ -221,6 +232,7 @@ contains
           !   since tropopause has been reached.
           presi(nzm+k) = pres_trop
           ktrop = nzm+k
+          ! print*,'wtg_james2009 - short domain ktrop: ',ktrop
           EXIT
         end if
       end do
@@ -230,6 +242,8 @@ contains
       presc(nzm+1:ktrop-1) = &
            0.5*(presi(nzm+1:ktrop-1)+presi(nzm+2:ktrop))
     end if
+
+    ! print*,'wtg_james2009 - presi: ',presi
 
     !bloss: WTG based on Appendix of Blossey, Bretherton & Wyant, JAMES 2009.
 
