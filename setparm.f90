@@ -19,7 +19,7 @@ NAMELIST /PARAMETERS/ dodamping, doupperbound, docloud, doprecip, &
                 docoriolis, docoriolisz, dosurface, dolargescale, doradforcing, &
 								fluxt0,fluxq0,tau0,tabs_s,z0,nelapse, dt, dx, dy,  &
                 fcor, ug, vg, nstop, caseid, case_restart,caseid_restart, &
-								nstat, nstatfrq, nprint, nrestart, doradsimple, doradtendency, &
+								nstat, nstatfrq, nprint, nrestart, doradsimple, doradtendency, troptend, &
 								nsave3D, nsave3Dstart, nsave3Dend, dosfcforcing, &
 								donudging_uv, donudging_tq, &
                 donudging_t, donudging_q, tauls,tautqls,&
