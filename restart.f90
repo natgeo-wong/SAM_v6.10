@@ -1,7 +1,6 @@
 	subroutine write_all()
 	
 	use vars
-  use params, only: dokuangensemble
 	implicit none
 	character *4 rankchar
 	character *256 filename, filename_save
@@ -107,6 +106,7 @@
 	subroutine read_all()
 	
 	use vars
+  use params, only: dokuangensemble
 	implicit none
 	character *4 rankchar
 	character *256 filename
