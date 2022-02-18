@@ -4,6 +4,7 @@ program crm
 
 use vars
 use hbuffer
+use params, only: dokuangensemble
 use microphysics
 use sgs
 use tracers

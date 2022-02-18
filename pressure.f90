@@ -3,6 +3,7 @@ subroutine pressure
 ! call a pressure solver
 
 use grid
+use params, only: dokuangensemble
 implicit none
 
 call t_startf ('pressure')
