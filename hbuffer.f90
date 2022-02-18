@@ -324,6 +324,9 @@ data ntape/56/
 aver=1./dble(n)
 factor=1./dble(nx*ny)
 
+! Kuang Ensemble run: turn on mpi to calculate outpu (Song Qiyu, 2022)
+if(dokuangensemble) dompi = .true.
+
 if(dompi) then
   ! average condavg_factor across domains.  This will sum the
   ! weighting of all of the conditional statistics across the
@@ -542,6 +545,10 @@ if(dompi) then
    prec2=prec2*factor*aver-(precmean*factor*aver)**2
 
 endif
+
+! Kuang Ensemble run: turn off mpi after calculating buffer values (Song Qiyu, 2022)
+if(dokuangensemble) dompi = .false.
+
 if(masterproc) then
 
   open (ntape,file='./OUT_STAT/'// &

@@ -124,6 +124,9 @@ do while(nstep.lt.nstop.and.nelapse.gt.0)
 
   ncycle = 1
 
+  ! Kuang Ensemble run: turn off mpi entering each loop (Song Qiyu, 2022)
+  if(dokuangensemble) dompi = .false.
+
   call kurant()
 
   total_water_before = total_water()
@@ -364,6 +367,9 @@ do while(nstep.lt.nstop.and.nelapse.gt.0)
 !  collect statistics, write save-file, etc.
 
    call stepout(nstatsteps)
+
+   ! Kuang Ensemble run: turn on mpi after each loop (Song Qiyu, 2022)
+   if(dokuangensemble) dompi = .true.
   
 !----------------------------------------------------------
 !----------------------------------------------------------

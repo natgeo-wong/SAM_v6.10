@@ -69,8 +69,8 @@ NAMELIST /UWOPTIONS/ rad_simple_fluxdiv1, &
      doSmoothDamping, zbot_SmoothDamping, tau_SmoothDamping, &
      doenforce_cgils_qfloor, ztop_qfloor, qfloor, tau_qfloor
 
-
-
+! Options added by Kuang Lab at Harvard
+NAMELIST /KUANG_OPTIONS/ dokuangensemble
 
 !bloss: Create dummy namelist, so that we can figure out error code
 !       for a mising namelist.  This lets us differentiate between
@@ -95,7 +95,7 @@ close(55)
 
 
 !----------------------------------
-!  Read namelist for uw options from same prm file:
+!  Read namelist for uw and kuang_lab options from same prm file:
 !------------
 open(55,file='./'//trim(case)//'/prm', status='old',form='formatted')
 
@@ -125,12 +125,34 @@ if (ios.ne.0) then
 end if
 close(55)
 
+! Kuang Ensemble Run: read in KUANG_OPTIONS namelist (Nathanael Wong, 2022)
+read (UNIT=55,NML=KUANG_OPTIONS,IOSTAT=ios)
+if (ios.ne.0) then
+  if(masterproc) write(*,*) 'ios_missing_namelist = ', ios_missing_namelist
+  if(masterproc) write(*,*) 'ios for KUANG_OPTIONS = ', ios
+   !namelist error checking
+   if(ios.ne.ios_missing_namelist) then
+     rewind(55) !note that one must rewind before searching for new namelists
+     read (UNIT=55,NML=KUANG_OPTIONS)
+     if(masterproc) then
+       write(*,*) '****** ERROR: bad specification in KUANG_OPTIONS namelist'
+     end if
+      call task_abort()
+   elseif(masterproc) then
+      write(*,*) '****************************************************'
+      write(*,*) '****** No KUANG_OPTIONS namelist in prm file *********'
+      write(*,*) '****************************************************'
+   end if
+end if
+close(55)
+
 ! write namelist values out to file for documentation
 if(masterproc) then
       open(unit=55,file='./'//trim(case)//'/'//trim(case)//'_'//trim(caseid)//'.nml',&
             form='formatted', position='append')
       write (55,nml=PARAMETERS)
       write (55,nml=UWOPTIONS)
+      write (55,nml=KUANG_OPTIONS)
       write(55,*)
       close(55)
 end if
