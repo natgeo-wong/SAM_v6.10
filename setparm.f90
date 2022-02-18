@@ -218,6 +218,19 @@ end if
         if(tautqls.eq.99999999.) tautqls = tauls
 
         !===============================================================
+        ! KUANG_LAB ADDITION
+
+        if(dokuangensemble) then
+          if(masterproc) then
+            write(*,*) '*********************************************************'
+            write(*,*) '  Using the Kuang_Lab Ensemble Run Method'
+            write(*,*) '  This will turn off MPI in the model run, such that'
+            write(*,*) '  each subdomain is run independently of each other.'
+            write(*,*) '*********************************************************'
+          end if
+        end if
+
+        !===============================================================
         ! UW ADDITION
 
         if(dowtg_blossey_etal_JAMES2009) then
