@@ -100,6 +100,7 @@ module rad
                     only : thompson_cloud_optics_init, compute_thompson_cloud_optics
 
   use shr_orb_mod, only: shr_orb_params, shr_orb_decl, shr_orb_cosz
+  use params, only: dokuangensemble
 
   implicit none
   private
