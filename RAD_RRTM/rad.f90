@@ -812,8 +812,17 @@ contains
         s_flds = s_flds + sum(lwDownSurface(:, :))
       end if ! if(dostatis)
 
-      if(mod(nstep,nstat*(1+nrestart_skip)).eq.0.or.nstep.eq.nstop.or.nelapse.eq.0) &
-                 call write_rad() ! write radiation restart file
+      if(mod(nstep,nstat*(1+nrestart_skip)).eq.0.or.nstep.eq.nstop.or.nelapse.eq.0) then
+
+        ! Kuang Ensemble run: turn on mpi before writing (Song Qiyu, 2022)
+        if(dokuangensemble) dompi = .true.
+
+        call write_rad() ! write radiation restart file
+
+        ! Kuang Ensemble run: turn off mpi after writing (Song Qiyu, 2022)
+        if(dokuangensemble) dompi = .false.
+        
+      end if
 
     end if ! if icycle == 1
 
@@ -1102,6 +1111,9 @@ contains
     deallocate(pMLS, trace, STAT=ierr)
     endif
 
+    ! Kuang Ensemble run: turn on mpi for broadcast (Song Qiyu, 2022)
+    if(dokuangensemble) dompi = .true.
+
     if(dompi) then
       call task_bcast_real8(0,o3,nzm+1)
       call task_bcast_real8(0,co2,nzm+1)
@@ -1113,6 +1125,9 @@ contains
       call task_bcast_real8(0,cfc22,nzm+1)
       call task_bcast_real8(0,ccl4,nzm+1)
     end if
+
+    ! Kuang Ensemble run: turn off mpi after broadcast (Song Qiyu, 2022)
+    if(dokuangensemble) dompi = .false.
 
   end subroutine tracesini
   ! ----------------------------------------------------------------------------
