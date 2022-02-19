@@ -124,7 +124,6 @@ if (ios_uw.ne.0) then
       write(*,*) '****************************************************'
    end if
 end if
-close(55)
 
 ! Kuang Ensemble Run: read in KUANG_OPTIONS namelist (Nathanael Wong, 2022)
 read (UNIT=55,NML=KUANG_OPTIONS,IOSTAT=ios_kuang)
@@ -152,8 +151,8 @@ if(masterproc) then
       open(UNIT=55,file='./'//trim(case)//'/'//trim(case)//'_'//trim(caseid)//'.nml',&
             form='formatted')
       write (55,NML=PARAMETERS)
-      if(ios_uw.ne.ios_missing_namelist) write (55,NML=UWOPTIONS)
-      if(ios_kuang.ne.ios_missing_namelist) write (55,NML=KUANG_OPTIONS)
+      write (55,NML=UWOPTIONS)
+      write (55,NML=KUANG_OPTIONS)
       write(55,*)
       close(55)
 end if
