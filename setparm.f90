@@ -96,7 +96,7 @@ close(55)
 
 
 !----------------------------------
-!  Read namelist for uw and kuang_lab options from same prm file:
+!  Read namelist for uw options from same prm file:
 !------------
 open(55,file='./'//trim(case)//'/prm', status='old',form='formatted')
 
@@ -120,10 +120,21 @@ if (ios_uw.ne.0) then
       call task_abort()
    elseif(masterproc) then
       write(*,*) '****************************************************'
-      write(*,*) '****** No UWOPTIONS namelist in prm file *********'
+      write(*,*) '******** No UWOPTIONS namelist in prm file *********'
       write(*,*) '****************************************************'
    end if
 end if
+close(55)
+
+!----------------------------------
+!  Read namelist for kuang_lab options from same prm file:
+!------------
+open(55,file='./'//trim(case)//'/prm', status='old',form='formatted')
+
+!bloss: get error code for missing namelist (by giving the name for
+!       a namelist that doesn't exist in the prm file).
+read (UNIT=55,NML=BNCUIODSBJCB,IOSTAT=ios_missing_namelist)
+rewind(55) !note that one must rewind before searching for new namelists
 
 ! Kuang Ensemble Run: read in KUANG_OPTIONS namelist (Nathanael Wong, 2022)
 read (UNIT=55,NML=KUANG_OPTIONS,IOSTAT=ios_kuang)
@@ -140,7 +151,7 @@ if (ios_kuang.ne.0) then
       call task_abort()
    elseif(masterproc) then
       write(*,*) '****************************************************'
-      write(*,*) '****** No KUANG_OPTIONS namelist in prm file *********'
+      write(*,*) '****** No KUANG_OPTIONS namelist in prm file *******'
       write(*,*) '****************************************************'
    end if
 end if
