@@ -10,6 +10,7 @@ use microphysics, only: micro_setparm
 use sgs, only: sgs_setparm
 use movies, only : irecc
 use instrument_diagnostics, only: zero_instr_diag
+use grid, only: dompi
 implicit none
 
 integer icondavg, ierr, ios_uw, ios_kuang, ios_missing_namelist, place_holder
