@@ -230,7 +230,7 @@ end if
             write(*,*) '  restart files.'
             write(*,*) '*********************************************************'
           end if
-        else if(dokuangensemble.AND.(.NOT.dompi))
+        else if(dokuangensemble.AND.(.NOT.dompi)) then
           dokuangensemble = .false.
           if(masterproc) then
             write(*,*) '*********************************************************'
