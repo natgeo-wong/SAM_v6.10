@@ -373,44 +373,6 @@ do while(nstep.lt.nstop.and.nelapse.gt.0)
    if(dokuangensemble) dompi = .true.
   
 !----------------------------------------------------------
-!----------------------------------------------------------
-
-   ! bloss:  only stop when stat and 2D fields are output.
-   !bloss(2016-09-07): if saving local MSE budgets, only stop when they are output
-   if ( (nstep.lt.nstop).and.(mod(nstep,nstat).eq.0) .AND. &
-        ( (.NOT.save2Davg) .OR. (mod(nstep,nsave2D).eq.0) ) .AND. &
-        ( (.NOT.do_chunked_energy_budgets) .OR. (mod(nstep,nsaveMSE).eq.0) ) )then
-
-     if(masterproc) then
-       call t_stampf(cputime,usrtime,systime)
-       write(*,999) cputime-oldtime, float(nstep-oldstep)*dt/3600.
-999    format('CPU TIME = ',f12.4, ' OVER ', f8.2,' MODEL HOURS')
-
-       elapsed_time = cputime-init_time
-       if ((elapsed_time+2.*(cputime-oldtime)).gt.60.*float(nelapsemin)) then
-         nelapse=0 ! Job will stop when nelapse=0
-         write(*,*) 'Job stopping -- nelapsemin reached'
-
-         !bloss: Restructure automated job resubmission so that it does not
-         !  rely on the return of a particular error code.  That
-         !  approach doesn not work on Cheyenne.
-         open(unit=47,file='ReadyForRestart',form='FORMATTED',status='REPLACE')
-         rewind(47)
-         write(47,992) 
-992      format('TRUE')
-         close(47)
-       end if
-
-       oldtime = cputime
-       oldstep = nstep
-     end if
-
-      if(dompi) then
-        if(masterproc) itmp1 = nelapse
-        call task_bcast_integer(0,itmp1,1)
-        nelapse = itmp1(1)
-      end if
-   end if
 
 end do ! main loop
 
