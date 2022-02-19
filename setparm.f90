@@ -149,11 +149,11 @@ close(55)
 
 ! write namelist values out to file for documentation
 if(masterproc) then
-      open(unit=55,file='./OUT_STAT/'//trim(case)//'_'//trim(caseid)//'.nml',&
+      open(UNIT=55,file='./'//trim(case)//'/'//trim(case)//'_'//trim(caseid)//'.nml',&
             form='formatted')
-      write (55,nml=PARAMETERS)
-      write (55,nml=UWOPTIONS)
-      write (55,nml=KUANG_OPTIONS)
+      write (55,NML=PARAMETERS)
+      if(ios_uw.ne.ios_missing_namelist) write (55,NML=UWOPTIONS)
+      if(ios_kuang.ne.ios_missing_namelist) write (55,NML=KUANG_OPTIONS)
       write(55,*)
       close(55)
 end if
