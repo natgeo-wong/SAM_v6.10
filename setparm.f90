@@ -220,12 +220,23 @@ end if
         !===============================================================
         ! KUANG_LAB ADDITION
 
-        if(dokuangensemble) then
+        if(dokuangensemble.AND.dompi) then
           if(masterproc) then
             write(*,*) '*********************************************************'
             write(*,*) '  Using the Kuang_Lab Ensemble Run Method'
             write(*,*) '  This will turn off MPI in the model run, such that'
             write(*,*) '  each subdomain is run independently of each other.'
+            write(*,*) '  However, MPI is turned on for saving of output and'
+            write(*,*) '  restart files.'
+            write(*,*) '*********************************************************'
+          end if
+        else if(dokuangensemble.AND.(.NOT.dompi))
+          dokuangensemble = .false.
+          if(masterproc) then
+            write(*,*) '*********************************************************'
+            write(*,*) '  Do not use the Kuang_Lab Ensemble Run Method'
+            write(*,*) '  MPI is not called because number of processors = 1'
+            write(*,*) '  Setting dokuangensemble to FALSE'
             write(*,*) '*********************************************************'
           end if
         end if
