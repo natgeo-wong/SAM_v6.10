@@ -12,7 +12,7 @@ use movies, only : irecc
 use instrument_diagnostics, only: zero_instr_diag
 implicit none
 
-integer icondavg, ierr, ios, ios_missing_namelist, place_holder
+integer icondavg, ierr, ios_uw, ios_kuang, ios_missing_namelist, place_holder
 
 NAMELIST /PARAMETERS/ dodamping, doupperbound, docloud, doprecip, &
                 dolongwave, doshortwave, dosgs, dz, doconstdz, &
@@ -105,12 +105,12 @@ read (UNIT=55,NML=BNCUIODSBJCB,IOSTAT=ios_missing_namelist)
 rewind(55) !note that one must rewind before searching for new namelists
 
 !bloss: read in UWOPTIONS namelist
-read (UNIT=55,NML=UWOPTIONS,IOSTAT=ios)
-if (ios.ne.0) then
+read (UNIT=55,NML=UWOPTIONS,IOSTAT=ios_uw)
+if (ios_uw.ne.0) then
   if(masterproc) write(*,*) 'ios_missing_namelist = ', ios_missing_namelist
-  if(masterproc) write(*,*) 'ios for UWOPTIONS = ', ios
+  if(masterproc) write(*,*) 'ios for UWOPTIONS = ', ios_uw
    !namelist error checking
-   if(ios.ne.ios_missing_namelist) then
+   if(ios_uw.ne.ios_missing_namelist) then
      rewind(55) !note that one must rewind before searching for new namelists
      read (UNIT=55,NML=UWOPTIONS)
      if(masterproc) then
@@ -126,12 +126,12 @@ end if
 close(55)
 
 ! Kuang Ensemble Run: read in KUANG_OPTIONS namelist (Nathanael Wong, 2022)
-read (UNIT=55,NML=KUANG_OPTIONS,IOSTAT=ios)
-if (ios.ne.0) then
+read (UNIT=55,NML=KUANG_OPTIONS,IOSTAT=ios_kuang)
+if (ios_kuang.ne.0) then
   if(masterproc) write(*,*) 'ios_missing_namelist = ', ios_missing_namelist
-  if(masterproc) write(*,*) 'ios for KUANG_OPTIONS = ', ios
+  if(masterproc) write(*,*) 'ios for KUANG_OPTIONS = ', ios_kuang
    !namelist error checking
-   if(ios.ne.ios_missing_namelist) then
+   if(ios_kuang.ne.ios_missing_namelist) then
      rewind(55) !note that one must rewind before searching for new namelists
      read (UNIT=55,NML=KUANG_OPTIONS)
      if(masterproc) then
