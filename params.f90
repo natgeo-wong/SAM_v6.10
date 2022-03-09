@@ -119,7 +119,7 @@ logical:: doseawater = .true. !bloss(Set UW default to true!!) .false.
 logical:: doradtendency = .false. ! Radiative tendencies as per Pauluis & Garner [2006]
 
 ! Kuang Options
-logical:: dokuangensemble = .false. ! Subdomains defined in domains.f90 are run separately
+logical:: dompiensemble = .false. ! Subdomains defined in domains.f90 are run separately
 
 real:: troptend = 1.5 ! Convective tendency in Pauluis & Garner [2006]
 

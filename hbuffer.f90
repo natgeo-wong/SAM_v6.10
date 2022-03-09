@@ -324,8 +324,8 @@ data ntape/56/
 aver=1./dble(n)
 factor=1./dble(nx*ny)
 
-! Kuang Ensemble run: turn on mpi to calculate outpu (Song Qiyu, 2022)
-if(dokuangensemble) dompi = .true.
+! MPI Ensemble run: turn on mpi to calculate outpu (Song Qiyu, 2022)
+if(dompiensemble) dompi = .true.
 
 if(dompi) then
   ! average condavg_factor across domains.  This will sum the
@@ -546,8 +546,8 @@ if(dompi) then
 
 endif
 
-! Kuang Ensemble run: turn off mpi after calculating buffer values (Song Qiyu, 2022)
-if(dokuangensemble) dompi = .false.
+! MPI Ensemble run: turn off mpi after calculating buffer values (Song Qiyu, 2022)
+if(dompiensemble) dompi = .false.
 
 if(masterproc) then
 

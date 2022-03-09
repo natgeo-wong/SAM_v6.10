@@ -4,7 +4,7 @@ program crm
 
 use vars
 use hbuffer
-use params, only: dokuangensemble
+use params, only: dompiensemble
 use microphysics
 use sgs
 use tracers
@@ -125,8 +125,8 @@ do while(nstep.lt.nstop.and.nelapse.gt.0)
 
   ncycle = 1
 
-  ! Kuang Ensemble run: turn off mpi entering each loop (Song Qiyu, 2022)
-  if(dokuangensemble) dompi = .false.
+  ! MPI Ensemble run: turn off mpi entering each loop (Song Qiyu, 2022)
+  if(dompiensemble) dompi = .false.
 
   call kurant()
 
@@ -369,8 +369,8 @@ do while(nstep.lt.nstop.and.nelapse.gt.0)
 
    call stepout(nstatsteps)
 
-   ! Kuang Ensemble run: turn on mpi after each loop (Song Qiyu, 2022)
-   if(dokuangensemble) dompi = .true.
+   ! MPI Ensemble run: turn on mpi after each loop (Song Qiyu, 2022)
+   if(dompiensemble) dompi = .true.
   
 !----------------------------------------------------------
 
