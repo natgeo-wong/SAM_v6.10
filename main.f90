@@ -15,7 +15,7 @@ use mse, only: init_MSE_tendency, compute_and_increment_MSE_tendency, &
 implicit none
 
 integer k, icyc, nn, nstatsteps
-double precision cputime, oldtime, init_time, elapsed_time !bloss wallclocktime
+double precision cputime, oldtime, init_time !bloss wallclocktime
 double precision usrtime, systime
 integer itmp1(1), oldstep
 logical :: log_Exists
@@ -373,6 +373,28 @@ do while(nstep.lt.nstop.and.nelapse.gt.0)
    if(dompiensemble) dompi = .true.
   
 !----------------------------------------------------------
+!----------------------------------------------------------
+
+   ! bloss:  only stop when stat and 2D fields are output.
+   !bloss(2016-09-07): if saving local MSE budgets, only stop when they are output
+   if ( (nstep.lt.nstop).and.(mod(nstep,nstat).eq.0) .AND. &
+        ( (.NOT.save2Davg) .OR. (mod(nstep,nsave2D).eq.0) ) .AND. &
+        ( (.NOT.do_chunked_energy_budgets) .OR. (mod(nstep,nsaveMSE).eq.0) ) )then
+
+     if(masterproc) then
+       call t_stampf(cputime,usrtime,systime)
+       write(*,999) cputime-oldtime, float(nstep-oldstep)*dt/3600.
+999    format('CPU TIME = ',f12.4, ' OVER ', f8.2,' MODEL HOURS')
+       oldtime = cputime
+       oldstep = nstep
+     end if
+
+      if(dompi) then
+        if(masterproc) itmp1 = nelapse
+        call task_bcast_integer(0,itmp1,1)
+        nelapse = itmp1(1)
+      end if
+   end if
 
 end do ! main loop
 
