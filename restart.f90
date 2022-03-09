@@ -106,6 +106,7 @@
 	subroutine read_all()
 	
 	use vars
+  use params, only: dompiensemble
 	implicit none
 	character *4 rankchar
 	character *256 filename
@@ -180,9 +181,15 @@
 
 ! update the boundaries 
 ! (just in case when some parameterization initializes and needs boundary points)
+        ! MPI Ensemble run: turn off mpi for boundaries and diagnose (Song Qiyu, 2022)
+        if(dompiensemble) dompi = .false.
 
+        call diagnose() ! added by qiyusong  
         call boundaries(0)
         call boundaries(4)
+
+        ! MPI Ensemble run: turn on mpi after boundaries and diagnose (Song Qiyu, 2022)
+        if(dompiensemble) dompi = .true.
 
         return
         end

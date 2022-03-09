@@ -10,9 +10,10 @@ use microphysics, only: micro_setparm
 use sgs, only: sgs_setparm
 use movies, only : irecc
 use instrument_diagnostics, only: zero_instr_diag
+use grid, only: dompi
 implicit none
 
-integer icondavg, ierr, ios, ios_missing_namelist, place_holder
+integer icondavg, ierr, ios_uw, ios_kuang, ios_missing_namelist, place_holder
 
 NAMELIST /PARAMETERS/ dodamping, doupperbound, docloud, doprecip, &
                 dolongwave, doshortwave, dosgs, dz, doconstdz, &
@@ -69,8 +70,8 @@ NAMELIST /UWOPTIONS/ rad_simple_fluxdiv1, &
      doSmoothDamping, zbot_SmoothDamping, tau_SmoothDamping, &
      doenforce_cgils_qfloor, ztop_qfloor, qfloor, tau_qfloor
 
-
-
+! Options added by Kuang Lab at Harvard
+NAMELIST /KUANG_OPTIONS/ dompiensemble
 
 !bloss: Create dummy namelist, so that we can figure out error code
 !       for a mising namelist.  This lets us differentiate between
@@ -105,12 +106,12 @@ read (UNIT=55,NML=BNCUIODSBJCB,IOSTAT=ios_missing_namelist)
 rewind(55) !note that one must rewind before searching for new namelists
 
 !bloss: read in UWOPTIONS namelist
-read (UNIT=55,NML=UWOPTIONS,IOSTAT=ios)
-if (ios.ne.0) then
+read (UNIT=55,NML=UWOPTIONS,IOSTAT=ios_uw)
+if (ios_uw.ne.0) then
   if(masterproc) write(*,*) 'ios_missing_namelist = ', ios_missing_namelist
-  if(masterproc) write(*,*) 'ios for UWOPTIONS = ', ios
+  if(masterproc) write(*,*) 'ios for UWOPTIONS = ', ios_uw
    !namelist error checking
-   if(ios.ne.ios_missing_namelist) then
+   if(ios_uw.ne.ios_missing_namelist) then
      rewind(55) !note that one must rewind before searching for new namelists
      read (UNIT=55,NML=UWOPTIONS)
      if(masterproc) then
@@ -119,7 +120,38 @@ if (ios.ne.0) then
       call task_abort()
    elseif(masterproc) then
       write(*,*) '****************************************************'
-      write(*,*) '****** No UWOPTIONS namelist in prm file *********'
+      write(*,*) '******** No UWOPTIONS namelist in prm file *********'
+      write(*,*) '****************************************************'
+   end if
+end if
+close(55)
+
+!----------------------------------
+!  Read namelist for kuang_lab options from same prm file:
+!------------
+open(55,file='./'//trim(case)//'/prm', status='old',form='formatted')
+
+!bloss: get error code for missing namelist (by giving the name for
+!       a namelist that doesn't exist in the prm file).
+read (UNIT=55,NML=BNCUIODSBJCB,IOSTAT=ios_missing_namelist)
+rewind(55) !note that one must rewind before searching for new namelists
+
+! MPI Ensemble Run: read in KUANG_OPTIONS namelist (Nathanael Wong, 2022)
+read (UNIT=55,NML=KUANG_OPTIONS,IOSTAT=ios_kuang)
+if (ios_kuang.ne.0) then
+  if(masterproc) write(*,*) 'ios_missing_namelist = ', ios_missing_namelist
+  if(masterproc) write(*,*) 'ios for KUANG_OPTIONS = ', ios_kuang
+   !namelist error checking
+   if(ios_kuang.ne.ios_missing_namelist) then
+     rewind(55) !note that one must rewind before searching for new namelists
+     read (UNIT=55,NML=KUANG_OPTIONS)
+     if(masterproc) then
+       write(*,*) '****** ERROR: bad specification in KUANG_OPTIONS namelist'
+     end if
+      call task_abort()
+   elseif(masterproc) then
+      write(*,*) '****************************************************'
+      write(*,*) '****** No KUANG_OPTIONS namelist in prm file *******'
       write(*,*) '****************************************************'
    end if
 end if
@@ -127,10 +159,11 @@ close(55)
 
 ! write namelist values out to file for documentation
 if(masterproc) then
-      open(unit=55,file='./'//trim(case)//'/'//trim(case)//'_'//trim(caseid)//'.nml',&
-            form='formatted', position='append')
-      write (55,nml=PARAMETERS)
-      write (55,nml=UWOPTIONS)
+      open(UNIT=55,file='./'//trim(case)//'/'//trim(case)//'_'//trim(caseid)//'.nml',&
+            form='formatted')
+      write (55,NML=PARAMETERS)
+      write (55,NML=UWOPTIONS)
+      write (55,NML=KUANG_OPTIONS)
       write(55,*)
       close(55)
 end if
@@ -194,6 +227,30 @@ end if
 
 
         if(tautqls.eq.99999999.) tautqls = tauls
+
+        !===============================================================
+        ! KUANG_LAB ADDITION
+
+        if(dompiensemble.AND.dompi) then
+          if(masterproc) then
+            write(*,*) '*********************************************************'
+            write(*,*) '  Using the Kuang_Lab Ensemble Run Method'
+            write(*,*) '  This will turn off MPI in the model run, such that'
+            write(*,*) '  each subdomain is run independently of each other.'
+            write(*,*) '  However, MPI is turned on for saving of output and'
+            write(*,*) '  restart files.'
+            write(*,*) '*********************************************************'
+          end if
+        else if(dompiensemble.AND.(.NOT.dompi)) then
+          dompiensemble = .false.
+          if(masterproc) then
+            write(*,*) '*********************************************************'
+            write(*,*) '  Do not use the Kuang_Lab Ensemble Run Method'
+            write(*,*) '  MPI is not called because number of processors = 1'
+            write(*,*) '  Setting dompiensemble to FALSE'
+            write(*,*) '*********************************************************'
+          end if
+        end if
 
         !===============================================================
         ! UW ADDITION

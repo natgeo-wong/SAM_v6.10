@@ -100,6 +100,7 @@ module rad
                     only : thompson_cloud_optics_init, compute_thompson_cloud_optics
 
   use shr_orb_mod, only: shr_orb_params, shr_orb_decl, shr_orb_cosz
+  use params, only: dompiensemble
 
   implicit none
   private
@@ -812,8 +813,17 @@ contains
         s_flds = s_flds + sum(lwDownSurface(:, :))
       end if ! if(dostatis)
 
-      if(mod(nstep,nstat*(1+nrestart_skip)).eq.0.or.nstep.eq.nstop.or.nelapse.eq.0) &
-                 call write_rad() ! write radiation restart file
+      if(mod(nstep,nstat*(1+nrestart_skip)).eq.0.or.nstep.eq.nstop.or.nelapse.eq.0) then
+
+        ! MPI Ensemble run: turn on mpi before writing (Song Qiyu, 2022)
+        if(dompiensemble) dompi = .true.
+
+        call write_rad() ! write radiation restart file
+
+        ! MPI Ensemble run: turn off mpi after writing (Song Qiyu, 2022)
+        if(dompiensemble) dompi = .false.
+        
+      end if
 
     end if ! if icycle == 1
 
@@ -1102,6 +1112,9 @@ contains
     deallocate(pMLS, trace, STAT=ierr)
     endif
 
+    ! MPI Ensemble run: turn on mpi for broadcast (Song Qiyu, 2022)
+    if(dompiensemble) dompi = .true.
+
     if(dompi) then
       call task_bcast_real8(0,o3,nzm+1)
       call task_bcast_real8(0,co2,nzm+1)
@@ -1113,6 +1126,9 @@ contains
       call task_bcast_real8(0,cfc22,nzm+1)
       call task_bcast_real8(0,ccl4,nzm+1)
     end if
+
+    ! MPI Ensemble run: turn off mpi after broadcast (Song Qiyu, 2022)
+    if(dompiensemble) dompi = .false.
 
   end subroutine tracesini
   ! ----------------------------------------------------------------------------

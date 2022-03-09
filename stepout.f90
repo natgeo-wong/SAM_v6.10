@@ -65,7 +65,13 @@ if(mod(nstep,nstat).eq.0) then
 endif
 if(mod(nstep,nstat*(1+nrestart_skip)).eq.0.or.nstep.eq.nstop.or.nelapse.eq.0) then
 
+  ! MPI Ensemble run: turn on mpi before writing restart (Song Qiyu, 2022)
+  if(dompiensemble) dompi = .true.
+
   call write_all() ! save restart file
+
+  ! MPI Ensemble run: turn off mpi after writing restart (Song Qiyu, 2022)
+  if(dompiensemble) dompi = .false.
 
 end if
 
@@ -75,7 +81,14 @@ call t_startf ('2D_out')
 
 if(mod(nstep,nsave2D).eq.0.and.nstep.ge.nsave2Dstart &
                                    .and.nstep.le.nsave2Dend) then
+  ! MPI Ensemble run: turn on mpi before writing 2D output (Song Qiyu, 2022)
+  if(dompiensemble) dompi = .true.
+  
   call write_fields2D()
+
+  ! MPI Ensemble run: turn off mpi after writing 2D output (Song Qiyu, 2022)
+  if(dompiensemble) dompi = .false.
+
 endif
 
 if(.not.save2Davg.or.nstep.eq.nsave2Dstart-nsave2D) call stat_2Dinit(0) ! argument of 0 means storage terms for statistics are preserved
@@ -84,6 +97,10 @@ call t_stopf ('2D_out')
 
 call t_startf ('3D_out')
 if(mod(nstep,nsave3D).eq.0.and.nstep.ge.nsave3Dstart.and.nstep.le.nsave3Dend ) then
+
+  ! MPI Ensemble run: turn on mpi before writing 3D output (Song Qiyu, 2022)
+  if(dompiensemble) dompi = .true.
+
   ! determine if the maximum cloud water exceeds the threshold
   ! value to save 3D fields:
   qnmax(1)=0.
@@ -102,6 +119,10 @@ if(mod(nstep,nsave3D).eq.0.and.nstep.ge.nsave3Dstart.and.nstep.le.nsave3Dend ) t
   if(qnmax(1).ge.qnsave3D) then 
     call write_fields3D()
   end if
+
+  ! MPI Ensemble run: turn off mpi after writing 3D output (Song Qiyu, 2022)
+  if(dompiensemble) dompi = .false.
+
 endif
 call t_stopf ('3D_out')
 
@@ -117,172 +138,178 @@ if(masterproc) write(*,'(a,i10,a,i3,a,f6.3,a,f6.3)') 'NSTEP = ',nstep,'   NCYCLE
 if(mod(nstep,nprint).eq.0) then
 	
 
- divmin=1.e20
- divmax=-1.e20
-	 
- rdx = 1./dx
- rdy = 1./dy
+  divmin=1.e20
+  divmax=-1.e20
+    
+  rdx = 1./dx
+  rdy = 1./dy
 
- wmax=0.
- do k=1,nzm
-  coef = rho(k)*adz(k)*dz
-  rdz = 1./coef
-  if(ny.ne.1) then
-   do j=1,ny-1*YES3D
-    jc = j+1*YES3D
-    do i=1,nx-1
-     ic = i+1
-     div = (u(ic,j,k)-u(i,j,k))*rdx + (v(i,jc,k)-v(i,j,k))*rdy + &
-		  (w(i,j,k+1)*rhow(k+1)-w(i,j,k)*rhow(k))*rdz
-     divmax = max(divmax,div)
-     divmin = min(divmin,div)
-     if(w(i,j,k).gt.wmax) then
-	wmax=w(i,j,k)
-	im=i
-	jm=j
-	km=k
-     endif
+  wmax=0.
+  do k=1,nzm
+    coef = rho(k)*adz(k)*dz
+    rdz = 1./coef
+    if(ny.ne.1) then
+    do j=1,ny-1*YES3D
+      jc = j+1*YES3D
+      do i=1,nx-1
+      ic = i+1
+      div = (u(ic,j,k)-u(i,j,k))*rdx + (v(i,jc,k)-v(i,j,k))*rdy + &
+        (w(i,j,k+1)*rhow(k+1)-w(i,j,k)*rhow(k))*rdz
+      divmax = max(divmax,div)
+      divmin = min(divmin,div)
+      if(w(i,j,k).gt.wmax) then
+    wmax=w(i,j,k)
+    im=i
+    jm=j
+    km=k
+      endif
+      end do
     end do
-   end do
-  else
-    j = 1
-    do i=1,nx-1
-    ic = i+1
-     div = (u(ic,j,k)-u(i,j,k))*rdx +(w(i,j,k+1)*rhow(k+1)-w(i,j,k)*rhow(k))*rdz
-     divmax = max(divmax,div)
-     divmin = min(divmin,div)
-     if(w(i,j,k).gt.wmax) then
-	wmax=w(i,j,k)
-	im=i
-	jm=j
-	km=k
-     endif
-    end do
-  endif
- end do
+    else
+      j = 1
+      do i=1,nx-1
+      ic = i+1
+      div = (u(ic,j,k)-u(i,j,k))*rdx +(w(i,j,k+1)*rhow(k+1)-w(i,j,k)*rhow(k))*rdz
+      divmax = max(divmax,div)
+      divmin = min(divmin,div)
+      if(w(i,j,k).gt.wmax) then
+    wmax=w(i,j,k)
+    im=i
+    jm=j
+    km=k
+      endif
+      end do
+    endif
+  end do
 
- if(dompi) then
-   buffer(1) = total_water_before
-   buffer(2) = total_water_after
-   buffer(3) = total_water_evap
-   buffer(4) = total_water_prec
-   buffer(5) = total_water_ls
-   call task_sum_real8(buffer, buffer1,5)
-   total_water_before = buffer1(1)
-   total_water_after = buffer1(2)
-   total_water_evap = buffer1(3)
-   total_water_prec = buffer1(4)
-   total_water_ls = buffer1(5)
- end if
+  ! MPI Ensemble run: If MPI ensemble then need to sum up everything? (Nat, 2022)
+  if(dompiensemble) dompi = .true.
 
-!print*,rank,minval(u(1:nx,1:ny,:)),maxval(u(1:nx,1:ny,:))
-!print*,rank,'min:',minloc(u(1:nx,1:ny,:))
-!print*,rank,'max:',maxloc(u(1:nx,1:ny,:))
+  if(dompi) then
+    buffer(1) = total_water_before
+    buffer(2) = total_water_after
+    buffer(3) = total_water_evap
+    buffer(4) = total_water_prec
+    buffer(5) = total_water_ls
+    call task_sum_real8(buffer, buffer1,5)
+    total_water_before = buffer1(1)
+    total_water_after = buffer1(2)
+    total_water_evap = buffer1(3)
+    total_water_prec = buffer1(4)
+    total_water_ls = buffer1(5)
+  end if
 
-!if(masterproc) then
+  ! MPI Ensemble run: If MPI ensemble then need to sum up everything? (Nat, 2022)
+  if(dompiensemble) dompi = .false.
 
-!print*,'--->',tk(27,1,1)
-!print*,'tk->:'
-!write(6,'(16f7.2)')((tk(i,1,k),i=1,16),k=nzm,1,-1)
-!print*,'p->:'
-!write(6,'(16f7.2)')((p(i,1,k),i=1,16),k=nzm,1,-1)
-!print*,'u->:'
-!write(6,'(16f7.2)')((u(i,1,k),i=1,16),k=nzm,1,-1)
-!print*,'v->:'
-!write(6,'(16f7.2)')((v(i,1,k),i=1,16),k=nzm,1,-1)
-!print*,'w->:'
-!write(6,'(16f7.2)')((w(i,1,k),i=1,16),k=nzm,1,-1)
-!print*,'qcl:'
-!write(6,'(16f7.2)')((qcl(i,1,k)*1000.,i=16,31),k=nzm,1,-1)
-!print*,'qpl->:'
-!write(6,'(16f7.2)')((qpl(i,1,k)*1000.,i=16,31),k=nzm,1,-1)
-!print*,'qcl:->'
-!write(6,'(16f7.2)')((qci(i,1,k)*1000.,i=16,31),k=nzm,1,-1)
-!print*,'qpl->:'
-!write(6,'(16f7.2)')((qpi(i,1,k)*1000.,i=16,31),k=nzm,1,-1)
-!print*,'qrad->:'
-!write(6,'(16f7.2)')((qrad(i,1,k)*3600.,i=16,31),k=nzm,1,-1)
-!print*,'qv->:'
-!write(6,'(16f7.2)')((qv(i,1,k)*1000.,i=16,31),k=nzm,1,-1)
-!print*,'t->:'
-!write(6,'(16f7.2)')((t(i,1,k),i=1,16),k=nzm,1,-1)
-!print*,'tabs->:'
-!write(6,'(16f7.2)')((tabs(i,1,k),i=16,31),k=nzm,1,-1)
+  !print*,rank,minval(u(1:nx,1:ny,:)),maxval(u(1:nx,1:ny,:))
+  !print*,rank,'min:',minloc(u(1:nx,1:ny,:))
+  !print*,rank,'max:',maxloc(u(1:nx,1:ny,:))
 
-!end if
+  !if(masterproc) then
 
-!--------------------------------------------------------
- if(masterproc) then
-	
+  !print*,'--->',tk(27,1,1)
+  !print*,'tk->:'
+  !write(6,'(16f7.2)')((tk(i,1,k),i=1,16),k=nzm,1,-1)
+  !print*,'p->:'
+  !write(6,'(16f7.2)')((p(i,1,k),i=1,16),k=nzm,1,-1)
+  !print*,'u->:'
+  !write(6,'(16f7.2)')((u(i,1,k),i=1,16),k=nzm,1,-1)
+  !print*,'v->:'
+  !write(6,'(16f7.2)')((v(i,1,k),i=1,16),k=nzm,1,-1)
+  !print*,'w->:'
+  !write(6,'(16f7.2)')((w(i,1,k),i=1,16),k=nzm,1,-1)
+  !print*,'qcl:'
+  !write(6,'(16f7.2)')((qcl(i,1,k)*1000.,i=16,31),k=nzm,1,-1)
+  !print*,'qpl->:'
+  !write(6,'(16f7.2)')((qpl(i,1,k)*1000.,i=16,31),k=nzm,1,-1)
+  !print*,'qcl:->'
+  !write(6,'(16f7.2)')((qci(i,1,k)*1000.,i=16,31),k=nzm,1,-1)
+  !print*,'qpl->:'
+  !write(6,'(16f7.2)')((qpi(i,1,k)*1000.,i=16,31),k=nzm,1,-1)
+  !print*,'qrad->:'
+  !write(6,'(16f7.2)')((qrad(i,1,k)*3600.,i=16,31),k=nzm,1,-1)
+  !print*,'qv->:'
+  !write(6,'(16f7.2)')((qv(i,1,k)*1000.,i=16,31),k=nzm,1,-1)
+  !print*,'t->:'
+  !write(6,'(16f7.2)')((t(i,1,k),i=1,16),k=nzm,1,-1)
+  !print*,'tabs->:'
+  !write(6,'(16f7.2)')((tabs(i,1,k),i=16,31),k=nzm,1,-1)
+
+  !end if
+
+  !--------------------------------------------------------
+  if(masterproc) then
+    
     print*,'DAY = ',day	
     write(6,*) 'NSTEP=',nstep
     write(6,*) 'div:',divmax,divmin
     if(.not.dodynamicocean) write(6,*) 'SST=',tabs_s 
     write(6,*) 'surface pressure=',pres0
 
- endif
+  endif
 
- call fminmax_print('u:',u,dimx1_u,dimx2_u,dimy1_u,dimy2_u,nzm)
- call fminmax_print('v:',v,dimx1_v,dimx2_v,dimy1_v,dimy2_v,nzm)
- call fminmax_print('w:',w,dimx1_w,dimx2_w,dimy1_w,dimy2_w,nz)
- call fminmax_print('p:',p,0,nx,1-YES3D,ny,nzm)
- call fminmax_print('t:',t,dimx1_s,dimx2_s,dimy1_s,dimy2_s,nzm)
- call fminmax_print('tabs:',tabs,1,nx,1,ny,nzm)
- call fminmax_print('qv:',qv,1,nx,1,ny,nzm)
- if(dosgs) call sgs_print()
- if(docloud) then
-   call fminmax_print('qcl:',qcl,1,nx,1,ny,nzm)
-   call fminmax_print('qci:',qci,1,nx,1,ny,nzm)
-   call micro_print()
- end if
- if(doprecip) then
-   call fminmax_print('qpl:',qpl,1,nx,1,ny,nzm)
-   call fminmax_print('qpi:',qpi,1,nx,1,ny,nzm)
- end if
- if(dolongwave.or.doshortwave) call fminmax_print('qrad(K/day):',qrad*86400.,1,nx,1,ny,nzm)
- if(dotracers) then
-   do k=1,ntracers
-     call fminmax_print(trim(tracername(k))//':',tracer(:,:,:,k),dimx1_s,dimx2_s,dimy1_s,dimy2_s,nzm)
-   end do
- end if
- call fminmax_print('shf:',fluxbt*cp*rhow(1),1,nx,1,ny,1)
- call fminmax_print('lhf:',fluxbq*lcond*rhow(1),1,nx,1,ny,1)
- call fminmax_print('uw:',fluxbu,1,nx,1,ny,1)
- call fminmax_print('vw:',fluxbv,1,nx,1,ny,1)
- call fminmax_print('sst:',sstxy+t00,0,nx,1-YES3D,ny,1)
+  call fminmax_print('u:',u,dimx1_u,dimx2_u,dimy1_u,dimy2_u,nzm)
+  call fminmax_print('v:',v,dimx1_v,dimx2_v,dimy1_v,dimy2_v,nzm)
+  call fminmax_print('w:',w,dimx1_w,dimx2_w,dimy1_w,dimy2_w,nz)
+  call fminmax_print('p:',p,0,nx,1-YES3D,ny,nzm)
+  call fminmax_print('t:',t,dimx1_s,dimx2_s,dimy1_s,dimy2_s,nzm)
+  call fminmax_print('tabs:',tabs,1,nx,1,ny,nzm)
+  call fminmax_print('qv:',qv,1,nx,1,ny,nzm)
+  if(dosgs) call sgs_print()
+  if(docloud) then
+    call fminmax_print('qcl:',qcl,1,nx,1,ny,nzm)
+    call fminmax_print('qci:',qci,1,nx,1,ny,nzm)
+    call micro_print()
+  end if
+  if(doprecip) then
+    call fminmax_print('qpl:',qpl,1,nx,1,ny,nzm)
+    call fminmax_print('qpi:',qpi,1,nx,1,ny,nzm)
+  end if
+  if(dolongwave.or.doshortwave) call fminmax_print('qrad(K/day):',qrad*86400.,1,nx,1,ny,nzm)
+  if(dotracers) then
+    do k=1,ntracers
+      call fminmax_print(trim(tracername(k))//':',tracer(:,:,:,k),dimx1_s,dimx2_s,dimy1_s,dimy2_s,nzm)
+    end do
+  end if
+  call fminmax_print('shf:',fluxbt*cp*rhow(1),1,nx,1,ny,1)
+  call fminmax_print('lhf:',fluxbq*lcond*rhow(1),1,nx,1,ny,1)
+  call fminmax_print('uw:',fluxbu,1,nx,1,ny,1)
+  call fminmax_print('vw:',fluxbv,1,nx,1,ny,1)
+  call fminmax_print('sst:',sstxy+t00,0,nx,1-YES3D,ny,1)
 
- total_water_before = total_water_before/float(nx_gl*ny_gl)
- total_water_after = total_water_after/float(nx_gl*ny_gl)
- total_water_evap = total_water_evap/float(nx_gl*ny_gl)
- total_water_prec = total_water_prec/float(nx_gl*ny_gl)
- total_water_ls = total_water_ls/float(nx_gl*ny_gl)
- 
- if(masterproc) then
-   
-   print*,'===========================' !bloss: I find this helpful for readability
-   print*,'total water budget:'
-   write(*,991) total_water_before !'before (mm):    ',total_water_before
-   write(*,992) total_water_after !'after (mm) :    ',total_water_after
-   write(*,993) total_water_evap !'evap (mm/day):  ',total_water_evap
-   write(*,994) total_water_prec !'prec (mm/day):  ',total_water_prec
-   write(*,995) total_water_ls !'ls (mm/day):    ',total_water_ls
-   write(*,996) (total_water_after-(total_water_before+total_water_evap+total_water_ls-total_water_prec))
-   991 format(' before (mm):       ',F16.11)
-   992 format(' after (mm):        ',F16.11)
-   993 format(' evaporation (mm):  ',F16.11)
-   994 format(' precipitation (mm):',F16.11)
-   995 format(' large-scale (mm):  ',F16.11)
-   996 format(' Imbalance (mm)    ',F16.11)
-   print*,'evap (mm/day):',total_water_evap/dt*86400.
-   print*,'prec (mm/day):',total_water_prec/dt*86400.
-   print*,'ls (mm/day):',total_water_ls/dt*86400.
-   print*,'imbalance (mm/day)', &
-     (total_water_after-total_water_before-total_water_evap-total_water_ls+total_water_prec)/dt*86400.
-   print*,' imbalance (rel error):', &
-     (total_water_after-(total_water_before+total_water_evap+total_water_ls-total_water_prec))/total_water_after
-   print*,'==========================='
+  total_water_before = total_water_before/float(nx_gl*ny_gl)
+  total_water_after = total_water_after/float(nx_gl*ny_gl)
+  total_water_evap = total_water_evap/float(nx_gl*ny_gl)
+  total_water_prec = total_water_prec/float(nx_gl*ny_gl)
+  total_water_ls = total_water_ls/float(nx_gl*ny_gl)
+  
+  if(masterproc) then
+    
+    print*,'===========================' !bloss: I find this helpful for readability
+    print*,'total water budget:'
+    write(*,991) total_water_before !'before (mm):    ',total_water_before
+    write(*,992) total_water_after !'after (mm) :    ',total_water_after
+    write(*,993) total_water_evap !'evap (mm/day):  ',total_water_evap
+    write(*,994) total_water_prec !'prec (mm/day):  ',total_water_prec
+    write(*,995) total_water_ls !'ls (mm/day):    ',total_water_ls
+    write(*,996) (total_water_after-(total_water_before+total_water_evap+total_water_ls-total_water_prec))
+    991 format(' before (mm):       ',F16.11)
+    992 format(' after (mm):        ',F16.11)
+    993 format(' evaporation (mm):  ',F16.11)
+    994 format(' precipitation (mm):',F16.11)
+    995 format(' large-scale (mm):  ',F16.11)
+    996 format(' Imbalance (mm)    ',F16.11)
+    print*,'evap (mm/day):',total_water_evap/dt*86400.
+    print*,'prec (mm/day):',total_water_prec/dt*86400.
+    print*,'ls (mm/day):',total_water_ls/dt*86400.
+    print*,'imbalance (mm/day)', &
+      (total_water_after-total_water_before-total_water_evap-total_water_ls+total_water_prec)/dt*86400.
+    print*,' imbalance (rel error):', &
+      (total_water_after-(total_water_before+total_water_evap+total_water_ls-total_water_prec))/total_water_after
+    print*,'==========================='
 
- end if
+  end if
 
 
 

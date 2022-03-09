@@ -4,6 +4,7 @@ program crm
 
 use vars
 use hbuffer
+use params, only: dompiensemble
 use microphysics
 use sgs
 use tracers
@@ -14,7 +15,7 @@ use mse, only: init_MSE_tendency, compute_and_increment_MSE_tendency, &
 implicit none
 
 integer k, icyc, nn, nstatsteps
-double precision cputime, oldtime, init_time, elapsed_time !bloss wallclocktime
+double precision cputime, oldtime, init_time !bloss wallclocktime
 double precision usrtime, systime
 integer itmp1(1), oldstep
 logical :: log_Exists
@@ -123,6 +124,9 @@ do while(nstep.lt.nstop.and.nelapse.gt.0)
 !------------------------------------------------------------------
 
   ncycle = 1
+
+  ! MPI Ensemble run: turn off mpi entering each loop (Song Qiyu, 2022)
+  if(dompiensemble) dompi = .false.
 
   call kurant()
 
@@ -364,6 +368,9 @@ do while(nstep.lt.nstop.and.nelapse.gt.0)
 !  collect statistics, write save-file, etc.
 
    call stepout(nstatsteps)
+
+   ! MPI Ensemble run: turn on mpi after each loop (Song Qiyu, 2022)
+   if(dompiensemble) dompi = .true.
   
 !----------------------------------------------------------
 !----------------------------------------------------------
@@ -378,22 +385,6 @@ do while(nstep.lt.nstop.and.nelapse.gt.0)
        call t_stampf(cputime,usrtime,systime)
        write(*,999) cputime-oldtime, float(nstep-oldstep)*dt/3600.
 999    format('CPU TIME = ',f12.4, ' OVER ', f8.2,' MODEL HOURS')
-
-       elapsed_time = cputime-init_time
-       if ((elapsed_time+2.*(cputime-oldtime)).gt.60.*float(nelapsemin)) then
-         nelapse=0 ! Job will stop when nelapse=0
-         write(*,*) 'Job stopping -- nelapsemin reached'
-
-         !bloss: Restructure automated job resubmission so that it does not
-         !  rely on the return of a particular error code.  That
-         !  approach doesn not work on Cheyenne.
-         open(unit=47,file='ReadyForRestart',form='FORMATTED',status='REPLACE')
-         rewind(47)
-         write(47,992) 
-992      format('TRUE')
-         close(47)
-       end if
-
        oldtime = cputime
        oldstep = nstep
      end if
