@@ -310,6 +310,8 @@ if(dolargescale.and.time.gt.timelargescale) then
 
     wsub(1:nzm) = wsub(1:nzm) + w_wtg(1:nzm)
 
+    dosubsidence = .true.
+
   end if
 
   mklsadv(:,:) = 0. ! move initialization here
