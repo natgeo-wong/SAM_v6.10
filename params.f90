@@ -116,12 +116,6 @@ logical:: dotracers = .false.
 logical:: dosmoke = .false.
 logical:: notracegases = .false.
 logical:: doseawater = .true. !bloss(Set UW default to true!!) .false.
-logical:: doradtendency = .false. ! Radiative tendencies as per Pauluis & Garner [2006]
-
-! Kuang Options
-logical:: dompiensemble = .false. ! Subdomains defined in domains.f90 are run separately
-
-real:: troptend = 1.5 ! Convective tendency in Pauluis & Garner [2006]
 
 ! Specify solar constant and zenith angle for perpetual insolation.
 ! Based onn Tompkins and Graig (1998)
@@ -147,5 +141,13 @@ logical:: doradaerosimple = .false.
 
 ! Option for writing restart file only at end of simulation
 logical:: dorestart_last_only = .false.
+
+!!! KUANG_LAB OPTIONS
+logical:: dompiensemble = .false. ! Subdomains defined in domains.f90 are run separately
+logical:: dowtg_raymondzeng_QJRMS2005 = .false.
+logical:: doradtendency = .false. ! Radiative tendencies as per Pauluis & Garner [2006]
+
+real:: troptend = 1.5 ! Convective tendency in Pauluis & Garner [2006]
+real:: t_wtg = 1. ! Relaxation timescale (in days) for WTG Approximation of Raymond and Zeng [2005]
 
 end module params
