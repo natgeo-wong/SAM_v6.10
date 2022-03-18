@@ -71,7 +71,8 @@ NAMELIST /UWOPTIONS/ rad_simple_fluxdiv1, &
      doenforce_cgils_qfloor, ztop_qfloor, qfloor, tau_qfloor
 
 ! Options added by Kuang Lab at Harvard
-NAMELIST /KUANG_OPTIONS/ dompiensemble, doradtendency, troptend, dot_wtg
+NAMELIST /KUANG_OPTIONS/ dompiensemble, doradtendency, troptend, &
+            dowtg_raymondzeng_QJRMS2005, t_wtg
 
 !bloss: Create dummy namelist, so that we can figure out error code
 !       for a mising namelist.  This lets us differentiate between
