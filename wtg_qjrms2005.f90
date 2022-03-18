@@ -24,11 +24,13 @@
 !   upwards as in SAM, the model for which this routine was first
 !   written.
 
-subroutine wtg_qjrms2005(nzm, nz, z, theta_ref, theta_model, tabs_model, t_wtg, w_wtg)
+subroutine wtg_qjrms2005(masterproc, nzm, nz, z, &
+                          theta_ref, theta_model, tabs_model, t_wtg, w_wtg)
 
 implicit none
 
 ! ======= inputs =======
+logical, intent(in) :: masterproc ! For printing out to logs
 integer, intent(in) :: nzm ! number of model levels
 integer, intent(in) :: nz  ! number of vertical levels
 real, intent(in) :: z(nz) ! pressure of model levels in Pa (domain-mean for LES)

@@ -306,7 +306,7 @@ if(dolargescale.and.time.gt.timelargescale) then
 
   if (dowtg_raymondzeng_QJRMS2005)
 
-    wtg_qjrms2005(nzm, nz, z, tp0, t0, tabs0, t_wtg, w_wtg)
+    wtg_qjrms2005(masterproc, nzm, nz, z, tp0, t0, tabs0, t_wtg, w_wtg)
 
     wsub(1:nzm) = wsub(1:nzm) + w_wtg(1:nzm)
 
