@@ -34,6 +34,7 @@ integer, intent(in) :: nz  ! number of vertical levels
 real, intent(in) :: z(nz) ! pressure of model levels in Pa (domain-mean for LES)
 real, intent(in) :: theta_ref(nzm) ! reference potential temperature sounding in K
 real, intent(in) :: theta_model(nzm) ! model potential temperature sounding in K (domain-mean for LES)
+real, intent(in) :: tabs_model(nzm) ! model temperature sounding in K (domain-mean for LES)
 
 ! WTG potential temperature relaxation timescale (t_wtg)
 !   default is 1 day (t_wtg = 86400 s)
@@ -42,6 +43,12 @@ real, intent(in) :: t_wtg     ! potential temperature relaxation timescale (seco
 ! ======= output =======
 real, intent(out) :: w_wtg(nzm) ! WTG large-scale pressure velocity in Pa/s on model levels.
 
+
+! ======= local variables =======
+integer :: k
+integer :: ktrop
+integer :: kbl
+real :: min_temp ! temporary variable used to find cold point of model sounding.
 real :: ztrop ! Height of tropopause level (m)
 real, parameter :: pi = 3.141592653589793 ! from MATLAB, format long.
 
@@ -87,4 +94,4 @@ do k = kbl,ktrop
 
 end do
 
-end subroutine wtg_james2009
+end subroutine wtg_qjrms2005
