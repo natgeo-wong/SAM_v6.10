@@ -25,7 +25,7 @@
 !   written.
 
 subroutine wtg_qjrms2005(masterproc, nzm, nz, z, &
-                          theta_ref, theta_model, tabs_model, t_wtg, w_wtg)
+                          theta_ref, theta_model, tabs_model, ttheta_wtg, w_wtg)
 
 implicit none
 
@@ -38,9 +38,9 @@ real, intent(in) :: theta_ref(nzm) ! reference potential temperature sounding in
 real, intent(in) :: theta_model(nzm) ! model potential temperature sounding in K (domain-mean for LES)
 real, intent(in) :: tabs_model(nzm) ! model temperature sounding in K (domain-mean for LES)
 
-! WTG potential temperature relaxation timescale (t_wtg)
-!   default is 1 day (t_wtg = 86400 s)
-real, intent(in) :: t_wtg     ! potential temperature relaxation timescale (seconds)
+! WTG potential temperature relaxation timescale (ttheta_wtg)
+!   default is 1 day^-1 (ttheta_wtg = 1/86400 s^-1)
+real, intent(in) :: ttheta_wtg     ! potential temperature relaxation timescale (s^-1)
 
 ! ======= output =======
 real, intent(out) :: w_wtg(nzm) ! WTG large-scale pressure velocity in Pa/s on model levels.
@@ -91,7 +91,7 @@ end do
 
 do k = kbl,ktrop
 
-  w_wtg(k) = sin(pi*z(k)/ztrop) * (theta_model(k)-theta_ref(k)) / t_wtg * &
+  w_wtg(k) = sin(pi*z(k)/ztrop) * (theta_model(k)-theta_ref(k)) * ttheta_wtg * &
               (z(k+1)-z(k-1)) / (theta_model(k+1)-theta_model(k-1))
 
 end do

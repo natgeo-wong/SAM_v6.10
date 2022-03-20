@@ -305,7 +305,19 @@ if(dolargescale.and.time.gt.timelargescale) then
 
   if (dowtg_raymondzeng_QJRMS2005) then
 
-    call wtg_qjrms2005(masterproc, nzm, nz, z, tp0, t0, tabs0, t_wtg, w_wtg)
+    if(ttheta_tscale.gt.0) then
+      twtgmax = (nstop * dt - timelargescale) * am_tscale
+      twtg = time-timelargescale
+      if(twtg.gt.twtgmax) then
+        ttheta_wtg_time = ttheta_wtg
+      else
+        ttheta_wtg_time = ttheta_wtg * twtg / twtgmax
+      endif
+    else
+      ttheta_wtg_time = ttheta_wtg
+    endif
+
+    call wtg_qjrms2005(masterproc, nzm, nz, z, tp0, t0, tabs0, ttheta_wtg_time, w_wtg)
 
     wsub(1:nzm) = wsub(1:nzm) + w_wtg(1:nzm)
 

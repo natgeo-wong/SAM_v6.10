@@ -72,7 +72,7 @@ NAMELIST /UWOPTIONS/ rad_simple_fluxdiv1, &
 
 ! Options added by Kuang Lab at Harvard
 NAMELIST /KUANG_OPTIONS/ dompiensemble, doradtendency, troptend, &
-            dowtg_raymondzeng_QJRMS2005, t_wtg
+            dowtg_raymondzeng_QJRMS2005, ttheta_wtg, ttheta_tscale
 
 !bloss: Create dummy namelist, so that we can figure out error code
 !       for a mising namelist.  This lets us differentiate between
@@ -274,7 +274,8 @@ end if
 
         if(dowtg_raymondzeng_QJRMS2005) then
           if(masterproc) write(*,*) 'WTG (based on Raymond and Zeng [2005]) is being used'
-          t_wtg = t_wtg*86400. ! convert from units of day to units of seconds.
+          ttheta_wtg = ttheta_wtg * 86400. ! convert from units of day to units of seconds.
+          ttheta_wtg = 1 / ttheta_wtg      ! convert from sec to sec^-1
         end if
 
         !===============================================================
