@@ -85,15 +85,24 @@ ztrop = z(ktrop)
 kbl = 1 ! set to be the model bottom
 do k = nzm,1,-1
   if (z(k)>1000) then
-    kbl = k-1
+    kbl = k
   end if
 end do
+
+if(masterproc) then
+  print *, 'kbl: ', kbl
+  print *, 'ktrop: ', ktrop
+end if
 
 do k = kbl,ktrop
 
   w_wtg(k) = sin(pi*z(k)/ztrop) * (theta_model(k)-theta_ref(k)) * ttheta_wtg * &
               (z(k+1)-z(k-1)) / (theta_model(k+1)-theta_model(k-1))
 
+end do
+
+do k = 1,(kbl-1)
+  w_wtg(k) = w_wtg(kbl) * z(k) / z(kbl)
 end do
 
 end subroutine wtg_qjrms2005
