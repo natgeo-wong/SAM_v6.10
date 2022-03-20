@@ -89,11 +89,6 @@ do k = nzm,1,-1
   end if
 end do
 
-if(masterproc) then
-  print *, 'kbl: ', kbl
-  print *, 'ktrop: ', ktrop
-end if
-
 do k = kbl,ktrop
 
   w_wtg(k) = sin(pi*z(k)/ztrop) * (theta_model(k)-theta_ref(k)) * ttheta_wtg * &
