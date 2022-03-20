@@ -148,7 +148,7 @@ logical:: dowtg_raymondzeng_QJRMS2005 = .false.
 logical:: doradtendency = .false. ! Radiative tendencies as per Pauluis & Garner [2006]
 
 real:: troptend = 1.5 ! Convective tendency in Pauluis & Garner [2006]
-real:: ttheta_wtg = 1. ! Relaxation timescale (in days) for WTG Approximation of Raymond and Zeng [2005]
+real:: ttheta_wtg = 1. ! Relaxation timescale (in hours) for WTG Approximation of Raymond and Zeng [2005]
 real:: ttheta_tscale = 0. ! period over which theta relaxation timescale scales from infinity to ttheta_wtg.  Express as fraction of time over which WTG large-scale forcing is implemented.  So if WTG/Large-scale is turned on for 100 days, twtg_scale = 1/4 means that the scaling up to WTG occurs over 25 days.
 
 end module params

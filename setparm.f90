@@ -274,7 +274,7 @@ end if
 
         if(dowtg_raymondzeng_QJRMS2005) then
           if(masterproc) write(*,*) 'WTG (based on Raymond and Zeng [2005]) is being used'
-          ttheta_wtg = ttheta_wtg * 86400. ! convert from units of day to units of seconds.
+          ttheta_wtg = ttheta_wtg * 3600. ! convert from units of hours to units of sec.
           ttheta_wtg = 1 / ttheta_wtg      ! convert from sec to sec^-1
         end if
 
