@@ -263,9 +263,7 @@ real cloudtopheight(nx,ny), echotopheight(nx,ny), cloudtoptemp(nx,ny)
 ! (added by Nathanael Wong on 2021/01/17)
 real twtg
 real twtgmax
-real am_wtg_c
-real am_wtg_coef
-real :: am_wtg_time = 1024
+real :: am_wtg_time
 
 logical :: IsInitializedRestartFilename = .false.
 CHARACTER(LEN=256) :: RestartFilename, RestartFilenameSave

@@ -246,14 +246,13 @@ if(dolargescale.and.time.gt.timelargescale) then
 
   if(dowtg_blossey_etal_JAMES2009) then
 
-    if(twtg_scale.gt.0) then
-      twtgmax = (nstop * dt - timelargescale) * twtg_scale
+    if(am_tscale.gt.0) then
+      twtgmax = (nstop * dt - timelargescale) * am_tscale
       twtg = time-timelargescale
-      am_wtg_c = log(am_wtg)/log(2.)/2
-      am_wtg_coef = erf((twtgmax/2 - twtg)/(twtgmax/5)) * (5-am_wtg_c) + 5 + am_wtg_c
-      am_wtg_time = 2 ** am_wtg_coef
-      if(am_wtg_time.gt.twtgmax) then
+      if(twtg.gt.twtgmax) then
         am_wtg_time = am_wtg
+      else
+        am_wtg_time = am_wtg * twtgmax / twtg
       endif
     else
       am_wtg_time = am_wtg
