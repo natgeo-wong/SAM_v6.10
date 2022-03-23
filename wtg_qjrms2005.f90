@@ -52,6 +52,7 @@ integer :: ktrop
 integer :: kbl
 real :: min_temp ! temporary variable used to find cold point of model sounding.
 real :: ztrop ! Height of tropopause level (m)
+real :: dthetadz ! Static Stability
 real, parameter :: pi = 3.141592653589793 ! from MATLAB, format long.
 
 if (z(nz) < 1.e4) then
@@ -91,8 +92,13 @@ end do
 
 do k = kbl,ktrop
 
-  w_wtg(k) = sin(pi*z(k)/ztrop) * (theta_model(k)-theta_ref(k)) * ttheta_wtg * &
-              (z(k+1)-z(k-1)) / (theta_model(k+1)-theta_model(k-1))
+  ! According to Raymond and Zeng (2005) model feedbacks in the upper troposphere can
+  ! otherwise result in very weak static stabilities and unrealistically
+  ! large values of w_wtg
+  dthetadz = (theta_model(k+1)-theta_model(k-1)) / (z(k+1)-z(k-1))
+  if (dthetadz.lt.1e-3) dthetadz = 1e-3
+
+  w_wtg(k) = sin(pi*z(k)/ztrop) * (theta_model(k)-theta_ref(k)) * ttheta_wtg / dthetadz
 
 end do
 
