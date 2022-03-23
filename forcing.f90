@@ -12,6 +12,7 @@ implicit none
 integer i,j,k,n,nn,m,iz,iday0,iday
 real coef, radtend, dayy
 real tt(nzm,2),qq(nzm,2),uu(nzm,2),vv(nzm,2),ww(nzm,2),tp(nzm,2),pp
+real tpm(nzm)
 real ratio1, ratio2, ratio_t1, ratio_t2
 logical zgrid, pgrid
 
@@ -317,7 +318,11 @@ if(dolargescale.and.time.gt.timelargescale) then
       ttheta_wtg_time = ttheta_wtg
     endif
 
-    call wtg_qjrms2005(masterproc, nzm, nz, z, tp0, t0, tabs0, ttheta_wtg_time, w_wtg)
+    do k = 1,nzm
+      tpm(k) = tabs0(k) * prespot(k)
+    end do
+
+    call wtg_qjrms2005(masterproc, nzm, nz, z, tp0, tpm, tabs0, ttheta_wtg_time, w_wtg)
 
     wsub(1:nzm) = wsub(1:nzm) + w_wtg(1:nzm)
 
