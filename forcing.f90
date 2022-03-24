@@ -322,7 +322,8 @@ if(dolargescale.and.time.gt.timelargescale) then
       tpm(k) = tabs0(k) * prespot(k)
     end do
 
-    call wtg_qjrms2005(masterproc, nzm, nz, z, tp0, tpm, tabs0, ttheta_wtg_time, w_wtg)
+    call wtg_qjrms2005(masterproc, nzm, nz, z, &
+                        tp0, tpm, tabs0, ttheta_wtg_time, boundstatic, w_wtg)
 
     wsub(1:nzm) = wsub(1:nzm) + w_wtg(1:nzm)
 

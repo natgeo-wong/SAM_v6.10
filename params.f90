@@ -145,6 +145,7 @@ logical:: dorestart_last_only = .false.
 !!! KUANG_LAB OPTIONS
 logical:: dompiensemble = .false. ! Subdomains defined in domains.f90 are run separately
 logical:: dowtg_raymondzeng_QJRMS2005 = .false.
+logical:: boundstatic = .false. ! Restrict the static stability lower bound to prevent unrealistically large values of w_wtg
 logical:: doradtendency = .false. ! Radiative tendencies as per Pauluis & Garner [2006]
 
 real:: troptend = 1.5 ! Convective tendency in Pauluis & Garner [2006]
