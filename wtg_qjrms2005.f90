@@ -25,8 +25,8 @@
 !   written.
 
 subroutine wtg_qjrms2005(masterproc, nzm, nz, z, &
-                          theta_ref, theta_model, tabs_model, ttheta_wtg, boundstatic, &
-                          w_wtg)
+                          theta_ref, theta_model, tabs_model, ttheta_wtg, &
+                          boundstatic, dthetadz_min, w_wtg)
 
 implicit none
 
@@ -42,7 +42,9 @@ real, intent(in) :: tabs_model(nzm) ! model temperature sounding in K (domain-me
 ! WTG potential temperature relaxation timescale (ttheta_wtg)
 !   default is 1 day^-1 (ttheta_wtg = 1/86400 s^-1)
 real, intent(in) :: ttheta_wtg     ! potential temperature relaxation timescale (s^-1)
+
 logical, intent(in) :: boundstatic ! Restrict lower bound for static stability
+real, intent(in) :: dthetadz_min   ! if boundstatic = .true., what is the minimum bound?
 
 ! ======= output =======
 real, intent(out) :: w_wtg(nzm) ! WTG large-scale pressure velocity in Pa/s on model levels.
@@ -95,7 +97,7 @@ end do
 do k = kbl,ktrop
 
   dthetadz = (theta_model(k+1)-theta_model(k-1)) / (z(k+1)-z(k-1))
-  if (boundstatic.AND.(dthetadz.lt.1e-3)) dthetadz = 1e-3
+  if (boundstatic.AND.(dthetadz.lt.dthetadz_min)) dthetadz = dthetadz_min
   ! According to Raymond and Zeng (2005) model feedbacks in the upper troposphere can
   ! otherwise result in very weak static stabilities and unrealistically
   ! large values of w_wtg
