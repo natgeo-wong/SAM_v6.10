@@ -97,7 +97,7 @@ end do
 do k = kbl,ktrop
 
   dthetadz = (theta_model(k+1)-theta_model(k-1)) / (z(k+1)-z(k-1))
-  if (boundstatic.AND.(dthetadz.lt.dthetadz_min)) dthetadz = dthetadz_min
+  if (boundstatic.AND.(dthetadz.lt.dthetadz_min).AND.(z(k)>5000)) dthetadz = dthetadz_min
   ! According to Raymond and Zeng (2005) model feedbacks in the upper troposphere can
   ! otherwise result in very weak static stabilities and unrealistically
   ! large values of w_wtg
