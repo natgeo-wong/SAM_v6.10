@@ -238,10 +238,9 @@ real :: wsub_ref(nz) = 0. ! used to output reference large-scale vertical motion
 real :: w_wtg(nz) ! for statistics output
 
 logical :: dowtg_blossey_etal_JAMES2009 = .false. ! alternate implementation
-real :: twtg_scale = 0. ! period over which gradual scaling of WTG from RCE state to full WTG state occurs.  Express as fraction of time over which WTG large-scale forcing is implemented.  So if WTG/Large-scale is turned on for 100 days, twtg_scale = 1/4 means that the scaling up to WTG occurs over 25 days.
 
-real :: am_wtg  = 2. ! momentum damping rate in 1/d -- note must be non-zero.
-            ! default= 2.
+real :: am_tscale = 0. ! period over which gradual scaling of WTG from RCE state to full WTG state occurs.  Express as fraction of time over which WTG large-scale forcing is implemented.  So if WTG/Large-scale is turned on for 100 days, twtg_scale = 1/4 means that the scaling up to WTG occurs over 25 days.
+real :: am_wtg = 1. ! momentum damping rate in 1/d -- note must be non-zero.
 real :: am_wtg_exp = 0. ! exponent of p/p0 in momentum damping rate.
 real :: lambda_wtg = 650.e3 ! quarter wavelength in m. default = 650.e3 (=650 km).
 

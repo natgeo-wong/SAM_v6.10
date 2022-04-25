@@ -51,7 +51,7 @@ real ustar (nx, ny), fluxbq_coef (nx, ny), qsat_surf (nx, ny), u10arr(nx, ny)
 
 real   t0(nzm), q0(nzm), qv0(nzm), tabs0(nzm), tl0(nzm), &
        tv0(nzm), u0(nzm), v0(nzm), &
-       tg0(nzm), qg0(nzm), ug0(nzm), vg0(nzm), p0(nzm), &
+       tg0(nzm), tp0(nzm), qg0(nzm), ug0(nzm), vg0(nzm), p0(nzm), &
        t01(nzm), q01(nzm), qp0(nzm), qn0(nzm), &
        usounding0(nzm), vsounding0(nzm), tg0_ref(nzm), qg0_ref(nzm), &
        qcldliq0(nzm), qpcpliq0(nzm), qcldice0(nzm), qpcpice0(nzm)
@@ -259,13 +259,14 @@ real swvp_xy(nx,ny)  ! saturated water vapor path (wrt water)
 ! Cloud and echo top heights, and cloud top temperature (instantaneous)
 real cloudtopheight(nx,ny), echotopheight(nx,ny), cloudtoptemp(nx,ny)
 
-! WTG am coefficient, for gradual WTG implementation from RCE to full damping state
+! WTG am and theta coefficients
+! for gradual WTG implementation from RCE to full damping state
 ! (added by Nathanael Wong on 2021/01/17)
+! (theta coefficients added by Nathanael Wong on 2022/03/19)
 real twtg
 real twtgmax
-real am_wtg_c
-real am_wtg_coef
-real :: am_wtg_time = 1024
+real :: am_wtg_time
+real :: ttheta_wtg_time
 
 logical :: IsInitializedRestartFilename = .false.
 CHARACTER(LEN=256) :: RestartFilename, RestartFilenameSave
