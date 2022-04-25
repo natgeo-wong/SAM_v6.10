@@ -20,7 +20,7 @@ NAMELIST /PARAMETERS/ dodamping, doupperbound, docloud, doprecip, &
                 docoriolis, docoriolisz, dosurface, dolargescale, doradforcing, &
 								fluxt0,fluxq0,tau0,tabs_s,z0,nelapse, dt, dx, dy,  &
                 fcor, ug, vg, nstop, caseid, case_restart,caseid_restart, &
-								nstat, nstatfrq, nprint, nrestart, doradsimple, doradtendency, troptend, &
+								nstat, nstatfrq, nprint, nrestart, doradsimple, &
 								nsave3D, nsave3Dstart, nsave3Dend, dosfcforcing, &
 								donudging_uv, donudging_tq, &
                 donudging_t, donudging_q, tauls,tautqls,&
@@ -62,16 +62,18 @@ NAMELIST /UWOPTIONS/ rad_simple_fluxdiv1, &
      Derbyshire_RelH_Low, Derbyshire_RelH_High, &
      Derbyshire_theta0, Derbyshire_LapseRate, &
      Derbyshire_tau, compute_advection_everywhere, &
-     dowtg_blossey_etal_JAMES2009, twtg_scale, &
+     dowtg_blossey_etal_JAMES2009, &
      dowtg_qnudge, itau_wtg_qnudge, &
      dowtg_tnudge, itau_wtg_tnudge,  taulz_wtg_tnudge, &
      tauz0_wtg_qnudge, taulz_wtg_qnudge, &
-     am_wtg, am_wtg_exp, lambda_wtg, nudge_to_sounding_winds, &
+     am_wtg, am_wtg_exp, am_tscale, lambda_wtg, nudge_to_sounding_winds, &
      doSmoothDamping, zbot_SmoothDamping, tau_SmoothDamping, &
      doenforce_cgils_qfloor, ztop_qfloor, qfloor, tau_qfloor
 
 ! Options added by Kuang Lab at Harvard
-NAMELIST /KUANG_OPTIONS/ dompiensemble
+NAMELIST /KUANG_OPTIONS/ dompiensemble, doradtendency, troptend, &
+            dowtg_raymondzeng_QJRMS2005, boundstatic, ttheta_wtg, ttheta_tscale, &
+            dthetadz_min
 
 !bloss: Create dummy namelist, so that we can figure out error code
 !       for a mising namelist.  This lets us differentiate between
@@ -253,19 +255,39 @@ end if
         end if
 
         !===============================================================
-        ! UW ADDITION
+        ! Weak Temperature Gradient Approximation Schemes
+
+        if(dowtg_blossey_etal_JAMES2009.AND.dowtg_raymondzeng_QJRMS2005) then
+          if(masterproc) then
+            write(*,*) '********************************************************'
+            write(*,*) '  Both WTG schemes (based on Blossey et al. [2009] and'
+            write(*,*) '  Raymond and Zeng [2005]) have been called.  Please'
+            write(*,*) '  select only one of these schemes to use.'
+            write(*,*) '********************************************************'
+          end if
+          call task_abort()
+        end if
 
         if(dowtg_blossey_etal_JAMES2009) then
-           if(masterproc) write(*,*) 'WTG (based on BBW09 in JAMES) is being used'
+          if(masterproc) write(*,*) 'WTG (based on BBW09 in JAMES) is being used'
           am_wtg = am_wtg/86400. ! convert from 1/d to 1/s.
         end if
+
+        if(dowtg_raymondzeng_QJRMS2005) then
+          if(masterproc) write(*,*) 'WTG (based on Raymond and Zeng [2005]) is being used'
+          ttheta_wtg = ttheta_wtg * 3600. ! convert from units of hours to units of sec.
+          ttheta_wtg = 1 / ttheta_wtg      ! convert from sec to sec^-1
+        end if
+
+        !===============================================================
+        ! UW ADDITION
 
         if((.NOT.save2Dbin).OR.(.NOT.save3Dbin)) then
           if(masterproc) then
             write(*,*) '*********************************************************'
-            write(*,*) 'Compressed integer 2D and 3D output is disabled in the UW'
-            write(*,*) '  version of SAM.  Please set save2Dbin=.true. and '
-            write(*,*) '  save3Dbin=.true. in the PARAMETERS namelist. '
+            write(*,*) '  Compressed integer 2D and 3D output is disabled in '
+            write(*,*) '  the UW version of SAM.  Please set save2Dbin=.true. '
+            write(*,*) '  and save3Dbin=.true. in the PARAMETERS namelist. '
             write(*,*) '  If you really want compressed integer output, talk'
             write(*,*) '  to Peter.'
             write(*,*) '*********************************************************'

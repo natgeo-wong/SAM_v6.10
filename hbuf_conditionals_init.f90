@@ -2,7 +2,7 @@ subroutine hbuf_conditionals_init(count,trcount)
   use vars, only: ncondavg, condavgname, condavglongname, &
        dowtg_blossey_etal_JAMES2009, use_scam_reference_sounding
   use rad, only: do_output_clearsky_heating_profiles
-  use params, only: dodamping, docoriolis, donudging_uv
+  use params, only: dodamping, docoriolis, donudging_uv, dowtg_raymondzeng_QJRMS2005
   implicit none
 
   ! Initialize the list of UW statistics variables written in statistics.f90
@@ -63,12 +63,12 @@ subroutine hbuf_conditionals_init(count,trcount)
          'Clearsky shortwave heating rate','K/d',0)
   end if
 
-  if(dowtg_blossey_etal_JAMES2009) then
+  if(dowtg_blossey_etal_JAMES2009.OR.dowtg_raymondzeng_QJRMS2005) then
     call add_to_namelist(count,trcount,'WWTG', &
          'Large-scale W induced by weak temperature gradient approx','m/s',0)
   end if
 
-  if(dowtg_blossey_etal_JAMES2009) then
+  if(dowtg_blossey_etal_JAMES2009.OR.dowtg_raymondzeng_QJRMS2005) then
     call add_to_namelist(count,trcount,'WOBSREF', &
          'Reference Large-scale W Before Modifications by WTG/Scaling','m/s',0)
   end if
