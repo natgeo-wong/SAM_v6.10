@@ -144,13 +144,19 @@ logical:: dorestart_last_only = .false.
 
 !!! KUANG_LAB OPTIONS
 logical:: dompiensemble = .false. ! Subdomains defined in domains.f90 are run separately
+
 logical:: dowtg_raymondzeng_QJRMS2005 = .false.
+logical:: dowtg_daleuetal_JAMES2015 = .false.
+logical:: dowtg_decomp2022 = .false.
 logical:: boundstatic = .true. ! Restrict the static stability lower bound to prevent unrealistically large values of w_wtg
-logical:: doradtendency = .false. ! Radiative tendencies as per Pauluis & Garner [2006]
 
 real:: troptend = 1.5 ! Convective tendency in Pauluis & Garner [2006]
 real:: ttheta_wtg = 1. ! Relaxation timescale (in hours) for WTG Approximation of Raymond and Zeng [2005]
 real:: ttheta_tscale = 0. ! period over which theta relaxation timescale scales from infinity to ttheta_wtg.  Express as fraction of time over which WTG large-scale forcing is implemented.  So if WTG/Large-scale is turned on for 100 days, twtg_scale = 1/4 means that the scaling up to WTG occurs over 25 days.
+real:: ttheta_a = 1. ! adjustment coefficient for half-sine curve
+real:: ttheta_b = 0. ! adjustment coefficient for full-sine curve
+
+logical:: doradtendency = .false. ! Radiative tendencies as per Pauluis & Garner [2006]
 real:: dthetadz_min = 1.e-3 ! if boundstatic = .true., what is the minimum bound? Default from Raymond & Zeng [2005] is 1.e-3 K/km
 
 end module params
