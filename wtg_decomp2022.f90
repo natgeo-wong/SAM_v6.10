@@ -26,7 +26,7 @@
 
 subroutine wtg_decomp2022(masterproc, nzm, nz, z, &
                           theta_ref, theta_model, tabs_model, ttheta_wtg, &
-                          ttheta_a, ttheta_ab, &
+                          ttheta_a, ttheta_b, &
                           boundstatic, dthetadz_min, w_wtg)
 
 implicit none
@@ -62,6 +62,8 @@ real :: ztrop ! Height of tropopause level (m)
 real :: dthetadz ! Static Stability
 real, parameter :: pi = 3.141592653589793 ! from MATLAB, format long.
 real :: theta_diff ! Static Stability
+real :: a ! decomposition constant into half-sine curve
+real :: b ! decomposition constant into full-sine curve
 
 if (z(nz) < 1.e4) then
 
