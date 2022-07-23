@@ -1307,12 +1307,12 @@ real :: relhobs(nzm)
         !   simulators from COSP v1.4.
         call compute_instr_diags()
         ! add output for WTG vertical velocity
-        if(dowtg_blossey_etal_JAMES2009.OR.dowtg_raymondzeng_QJRMS2005) then
+        if(dowtg_blossey_etal_JAMES2009.OR.dowtg_raymondzeng_QJRMS2005.OR.dowtg_daleuetal_JAMES2015.OR.dowtg_decomp2022) then
           call hbuf_put('WWTG',w_wtg,1.)
         end if
 
         ! add output for reference large-scale vertical velocity
-        if(dowtg_blossey_etal_JAMES2009.OR.dowtg_raymondzeng_QJRMS2005) then
+        if(dowtg_blossey_etal_JAMES2009.OR.dowtg_raymondzeng_QJRMS2005.OR.dowtg_daleuetal_JAMES2015.OR.dowtg_decomp2022) then
           call hbuf_put('WOBSREF',wsub_ref,1.)
         end if
 
