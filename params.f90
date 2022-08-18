@@ -148,6 +148,7 @@ logical:: dompiensemble = .false. ! Subdomains defined in domains.f90 are run se
 logical:: dowtg_raymondzeng_QJRMS2005 = .false.
 logical:: dowtg_daleuetal_JAMES2015 = .false.
 logical:: dowtg_decomp2022 = .false.
+logical:: dowtgLBL = .false.
 logical:: boundstatic = .true. ! Restrict the static stability lower bound to prevent unrealistically large values of w_wtg
 
 real:: ttheta_wtg = 1. ! Relaxation timescale (in hours) for WTG Approximation of Raymond and Zeng [2005]

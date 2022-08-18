@@ -27,7 +27,7 @@
 subroutine wtg_decomp2022(masterproc, nzm, nz, z, &
                           theta_ref, theta_model, tabs_model, ttheta_wtg, &
                           ttheta_a, ttheta_b, &
-                          boundstatic, dthetadz_min, w_wtg)
+                          dowtgLBL, boundstatic, dthetadz_min, w_wtg)
 
 implicit none
 
@@ -46,6 +46,7 @@ real, intent(in) :: ttheta_wtg ! potential temperature relaxation timescale (s^-
 real, intent(in) :: ttheta_a ! potential temperature relaxation timescale (s^-1)
 real, intent(in) :: ttheta_b ! potential temperature relaxation timescale (s^-1)
 
+logical, intent(in) :: dowtgLBL    ! Do linear interpolation for w_wtg at boundary layer
 logical, intent(in) :: boundstatic ! Restrict lower bound for static stability
 real, intent(in) :: dthetadz_min   ! if boundstatic = .true., what is the minimum bound?
 
@@ -94,11 +95,13 @@ ztrop = z(ktrop)
 ! ===== find index of boundary layer top =====
 ! the boundary layer is defined to be the bottom 1km layer of the atmosphere
 kbl = 1 ! set to be the model bottom
-do k = nzm,1,-1
-  if (z(k)>1000) then
-    kbl = k
-  end if
-end do
+if(dowtgLBL) then
+  do k = nzm,1,-1
+    if (z(k)>1000) then
+      kbl = k
+    end if
+  end do
+end if
 
 a = (theta_model(kbl)-theta_ref(kbl)) * sin(pi*z(k)  /ztrop) * z(kbl)
 b = (theta_model(kbl)-theta_ref(kbl)) * sin(pi*z(k)*2/ztrop) * z(kbl)
@@ -124,13 +127,15 @@ do k = kbl,ktrop
   ! otherwise result in very weak static stabilities and unrealistically
   ! large values of w_wtg
   theta_diff = theta_model(k)-theta_ref(k)
-  w_wtg(k) = (ttheta_a * a * theta_diff * sin(pi*z(k)  /ztrop) + &
-              ttheta_b * b * theta_diff * sin(pi*z(k)*2/ztrop)) * ttheta_wtg / dthetadz
+  w_wtg(k) = (ttheta_a * a * sin(pi*z(k)  /ztrop) + &
+              ttheta_b * b * sin(pi*z(k)*2/ztrop)) * theta_diff * ttheta_wtg / dthetadz
 
 end do
 
-do k = 1,(kbl-1)
-  w_wtg(k) = w_wtg(kbl) * z(k) / z(kbl)
-end do
+if(.NOT.dowtgLBL) then
+  do k = 1,(kbl-1)
+    w_wtg(k) = w_wtg(kbl) * z(k) / z(kbl)
+  end do
+end if
 
 end subroutine wtg_decomp2022
