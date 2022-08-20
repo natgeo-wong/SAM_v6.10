@@ -2,7 +2,8 @@ subroutine hbuf_conditionals_init(count,trcount)
   use vars, only: ncondavg, condavgname, condavglongname, &
        dowtg_blossey_etal_JAMES2009, use_scam_reference_sounding
   use rad, only: do_output_clearsky_heating_profiles
-  use params, only: dodamping, docoriolis, donudging_uv, dowtg_raymondzeng_QJRMS2005
+  use params, only: dodamping, docoriolis, donudging_uv, &
+       dowtg_raymondzeng_QJRMS2005, dowtg_daleuetal_JAMES2015, dowtg_decomp2022
   implicit none
 
   ! Initialize the list of UW statistics variables written in statistics.f90
