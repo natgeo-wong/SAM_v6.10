@@ -89,7 +89,7 @@ ztrop = z(ktrop)
 ! ===== find index of boundary layer top =====
 ! the boundary layer is defined to be the bottom 1km layer of the atmosphere
 kbl = 1 ! set to be the model bottom
-if(dowtgLBL) then
+if(.NOT.dowtgLBL) then
   do k = nzm,1,-1
     if (z(k)>1000) then
       kbl = k
