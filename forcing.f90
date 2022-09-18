@@ -327,7 +327,8 @@ if(dolargescale.and.time.gt.timelargescale) then
     if (dowtg_daleuetal_JAMES2015)   call wtg_james2015(masterproc, nzm, nz, z, &
                         tp0, tpm, tabs0, ttheta_wtg_time, boundstatic, dthetadz_min, w_wtg)
     if (dowtg_decomp2022)            call wtg_decomp2022(masterproc, nzm, nz, z, &
-                        tp0, tpm, tabs0, ttheta_wtg_time, ttheta_a, ttheta_b, dowtgLBL, boundstatic, dthetadz_min, w_wtg)
+                        tp0, tpm, tabs0, ttheta_wtg_time, ttheta_a, ttheta_b, dowtgLBL, boundstatic, &
+                        dthetadz_min, w_wtg, wwtga, wwtgb)
 
     wsub(1:nzm) = wsub(1:nzm) + w_wtg(1:nzm)
 

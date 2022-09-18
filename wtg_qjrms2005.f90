@@ -36,14 +36,14 @@ integer, intent(in) :: nzm ! number of model levels
 integer, intent(in) :: nz  ! number of vertical levels
 real, intent(in) :: z(nz) ! pressure of model levels in Pa (domain-mean for LES)
 real, intent(in) :: theta_ref(nzm) ! reference potential temperature sounding in K
-real, intent(in) :: theta_model(nzm) ! model potential temperature sounding in K (domain-mean for LES)
-real, intent(in) :: tabs_model(nzm) ! model temperature sounding in K (domain-mean for LES)
+real, intent(in) :: theta_model(nzm) ! model potential temperature profile in K (domain-mean for LES)
+real, intent(in) :: tabs_model(nzm) ! model temperature profile in K (domain-mean for LES)
 
 ! WTG potential temperature relaxation timescale (ttheta_wtg)
 !   default is 1 day^-1 (ttheta_wtg = 1/86400 s^-1)
 real, intent(in) :: ttheta_wtg     ! potential temperature relaxation timescale (s^-1)
 
-logical, intent(in) :: dowtgLBL    ! Do linear interpolation for w_wtg at boundary layer
+logical, intent(in) :: dowtgLBL    ! Calculate w_wtg at boundary layer instead of linear interpolation
 logical, intent(in) :: boundstatic ! Restrict lower bound for static stability
 real, intent(in) :: dthetadz_min   ! if boundstatic = .true., what is the minimum bound?
 
@@ -97,22 +97,36 @@ if(.NOT.dowtgLBL) then
   end do
 end if
 
-do k = kbl,ktrop
+if(.NOT.dowtgLBL)
+  do k = kbl,ktrop
 
-  dthetadz = (theta_model(k+1)-theta_model(k-1)) / (z(k+1)-z(k-1))
-  if (boundstatic.AND.(dthetadz.lt.dthetadz_min).AND.(z(k)>5000)) dthetadz = dthetadz_min
-  ! According to Raymond and Zeng (2005) model feedbacks in the upper troposphere can
-  ! otherwise result in very weak static stabilities and unrealistically
-  ! large values of w_wtg
-  
-  w_wtg(k) = sin(pi*z(k)/ztrop) * (theta_model(k)-theta_ref(k)) * ttheta_wtg / dthetadz
+    dthetadz = (theta_model(k+1)-theta_model(k-1)) / (z(k+1)-z(k-1))
+    if (boundstatic.AND.(dthetadz.lt.dthetadz_min).AND.(z(k)>5000)) dthetadz = dthetadz_min
+    ! According to Raymond and Zeng (2005) model feedbacks in the upper troposphere can
+    ! otherwise result in very weak static stabilities and unrealistically
+    ! large values of w_wtg
+    
+    w_wtg(k) = sin(pi*z(k)/ztrop) * (theta_model(k)-theta_ref(k)) * ttheta_wtg / dthetadz
 
-end do
-
-if(.NOT.dowtgLBL) then
+  end do
   do k = 1,(kbl-1)
     w_wtg(k) = w_wtg(kbl) * z(k) / z(kbl)
   end do
+else
+  do k = 2,ktrop
+
+    dthetadz = (theta_model(k+1)-theta_model(k-1)) / (z(k+1)-z(k-1))
+    if (boundstatic.AND.(dthetadz.lt.dthetadz_min)) dthetadz = dthetadz_min
+    ! According to Raymond and Zeng (2005) model feedbacks in the upper troposphere can
+    ! otherwise result in very weak static stabilities and unrealistically
+    ! large values of w_wtg
+    
+    w_wtg(k) = sin(pi*z(k)/ztrop) * (theta_model(k)-theta_ref(k)) * ttheta_wtg / dthetadz
+
+  end do
+  dthetadz = (theta_model(2)-theta_model(1)) / (z(2) - z(1))
+  if (boundstatic.AND.(dthetadz.lt.dthetadz_min)) dthetadz = dthetadz_min
+  w_wtg(1) = sin(pi*z(1)/ztrop) * (theta_model(1)-theta_ref(1)) * ttheta_wtg / dthetadz
 end if
 
 end subroutine wtg_qjrms2005

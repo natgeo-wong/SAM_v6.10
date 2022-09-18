@@ -74,6 +74,13 @@ subroutine hbuf_conditionals_init(count,trcount)
          'Reference Large-scale W Before Modifications by WTG/Scaling','m/s',0)
   end if
 
+  if(dowtg_decomp2022) then
+    call add_to_namelist(count,trcount,'WWTG_ACOEF', &
+         'Coefficient for Half-Sine Component of the WTG Vertical Velocity','',0)
+    call add_to_namelist(count,trcount,'WWTG_BCOEF', &
+         'Coefficient for Full-Sine Component of the WTG Vertical Velocity','',0)
+  end if
+
   !bloss: setup to add an arbitrary number of conditional statistics
   do n = 1,ncondavg
 

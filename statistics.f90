@@ -1316,6 +1316,11 @@ real :: relhobs(nzm)
           call hbuf_put('WOBSREF',wsub_ref,1.)
         end if
 
+		if(dowtg_decomp2022) then
+          call hbuf_put('WWTG_ACOEF',wwtga,1.)
+          call hbuf_put('WWTG_BCOEF',wwtgb,1.)
+        end if
+
 !---------------------------------------------------------
 !  Apparent heat/moisture sources/sinks
 
