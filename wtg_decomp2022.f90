@@ -121,7 +121,7 @@ end do
 a = a / ztrop
 b = b / ztrop
 
-if(.NOT.dowtgLBL)
+if(.NOT.dowtgLBL) then
   do k = kbl,ktrop
 
     dthetadz = (theta_model(k+1)-theta_model(k-1)) / (z(k+1)-z(k-1))
