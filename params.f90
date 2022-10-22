@@ -153,4 +153,8 @@ real:: ttheta_wtg = 1. ! Relaxation timescale (in hours) for WTG Approximation o
 real:: ttheta_tscale = 0. ! period over which theta relaxation timescale scales from infinity to ttheta_wtg.  Express as fraction of time over which WTG large-scale forcing is implemented.  So if WTG/Large-scale is turned on for 100 days, twtg_scale = 1/4 means that the scaling up to WTG occurs over 25 days.
 real:: dthetadz_min = 1.e-3 ! if boundstatic = .true., what is the minimum bound? Default from Raymond & Zeng [2005] is 1.e-3 K/km
 
+logical :: dooceantimeperturb = .false.
+real, dimension(:) :: tabs_ptscale = (/0./) ! Vector of sinusoidal periods, units in days
+real, dimension(:) :: tabs_pamp = (/0./)    ! Vector of sinusoidal amplitudes, units in K
+
 end module params
