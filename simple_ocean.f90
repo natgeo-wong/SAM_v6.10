@@ -149,7 +149,7 @@ SUBROUTINE sst_perturb()
 ! scenarios, which can be used to simulate temporal cycles at different scales.
 
   use vars, only: sstxy,t00
-  use params, only: tabs_s, tabs_ptscale, tabs_pamp
+  use params, only: ocean_type, tabs_s, tabs_ptscale, tabs_pamp
 
 ! parameters of the sinusoidal SST destribution 
 ! along the X for Walker-type simulatons( ocean-type = 1):
@@ -165,7 +165,7 @@ SUBROUTINE sst_perturb()
       tpert = 0
       tday  = 2 * pi / 86400
 
-      do itp=1,len(tabs_perturbtscale)
+      do itp=1,size(tabs_ptscale,1)
         tpert = tpert + tabs_pamp(itp) * sin(time*tday/tabs_ptscale(itp))
       end do
 
