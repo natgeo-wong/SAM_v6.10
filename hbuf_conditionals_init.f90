@@ -75,9 +75,9 @@ subroutine hbuf_conditionals_init(count,trcount)
   end if
 
   if(dowtg_decomp2022) then
-    call add_to_namelist(count,trcount,'WWTG_ACOEF', &
+    call add_to_namelist(count,trcount,'WWTG_A', &
          'Coefficient for Half-Sine Component of the WTG Vertical Velocity',' ',0)
-    call add_to_namelist(count,trcount,'WWTG_BCOEF', &
+    call add_to_namelist(count,trcount,'WWTG_B', &
          'Coefficient for Full-Sine Component of the WTG Vertical Velocity',' ',0)
   end if
 

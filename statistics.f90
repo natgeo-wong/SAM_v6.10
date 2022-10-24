@@ -1317,8 +1317,8 @@ real :: relhobs(nzm)
         end if
 
 		if(dowtg_decomp2022) then
-          call hbuf_put('WWTG_ACOEF',wwtga,1.)
-          call hbuf_put('WWTG_BCOEF',wwtgb,1.)
+          call hbuf_put('WWTG_A',wwtga,1.)
+          call hbuf_put('WWTG_B',wwtgb,1.)
         end if
 
 !---------------------------------------------------------
