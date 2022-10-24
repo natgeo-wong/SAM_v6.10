@@ -154,7 +154,7 @@ real:: ttheta_tscale = 0. ! period over which theta relaxation timescale scales 
 real:: dthetadz_min = 1.e-3 ! if boundstatic = .true., what is the minimum bound? Default from Raymond & Zeng [2005] is 1.e-3 K/km
 
 logical :: dooceantimeperturb = .false.
-real, allocatable, dimension(:) :: tabs_ptscale ! Vector of sinusoidal periods, units in days
-real, allocatable, dimension(:) :: tabs_pamp    ! Vector of sinusoidal amplitudes, units in K
+real, dimension(5) :: tabs_ptscale = (/0., 0., 0., 0., 0./) ! Vector of sinusoidal periods, units in days
+real, dimension(5) :: tabs_pamp    = (/0., 0., 0., 0., 0./) ! Vector of sinusoidal amplitudes, units in K
 
 end module params
