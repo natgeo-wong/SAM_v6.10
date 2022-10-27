@@ -110,10 +110,10 @@ b = (theta_model(kbl)-theta_ref(kbl)) * sin(pi*z(kbl)*2/ztrop) * z(kbl)
 
 do k = (kbl+1),ktrop
 
-  a = a + ((theta_model(k)   - theta_ref(k))   * sin(pi*z(k)  /ztrop) - &
+  a = a + ((theta_model(k)   - theta_ref(k))   * sin(pi*z(k)  /ztrop) + &
            (theta_model(k-1) - theta_ref(k-1)) * sin(pi*z(k-1)/ztrop)) * (z(k)-z(k-1))
 
-  b = b + ((theta_model(k)   - theta_ref(k))   * sin(pi*z(k)*2/ztrop) - &
+  b = b + ((theta_model(k)   - theta_ref(k))   * sin(pi*z(k)*2/ztrop) + &
            (theta_model(k-1) - theta_ref(k-1)) * sin(pi*z(k-1)*2/ztrop)) * (z(k)-z(k-1))
 
 end do
