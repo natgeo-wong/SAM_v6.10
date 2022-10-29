@@ -26,7 +26,7 @@
 
 subroutine wtg_qjrms2005(masterproc, nzm, nz, z, &
                           theta_ref, theta_model, tabs_model, ttheta_wtg, &
-                          dowtgLBL, boundstatic, dthetadz_min, w_wtg)
+                          dowtgLBL, boundstatic, dthetadz_min, w_wtg, wwtgr)
 
 implicit none
 
@@ -49,6 +49,7 @@ real, intent(in) :: dthetadz_min   ! if boundstatic = .true., what is the minimu
 
 ! ======= output =======
 real, intent(out) :: w_wtg(nzm) ! WTG large-scale pressure velocity in Pa/s on model levels.
+real, intent(out) :: wwtgr(nzm) ! Raw w_wtg, assuming constant = 1
 
 
 ! ======= local variables =======
@@ -59,6 +60,7 @@ real :: min_temp ! temporary variable used to find cold point of model sounding.
 real :: ztrop ! Height of tropopause level (m)
 real :: dthetadz ! Static Stability
 real, parameter :: pi = 3.141592653589793 ! from MATLAB, format long.
+real :: theta_diff ! Static Stability
 
 if (z(nz) < 1.e4) then
 
@@ -105,11 +107,13 @@ if(.NOT.dowtgLBL) then
     ! According to Raymond and Zeng (2005) model feedbacks in the upper troposphere can
     ! otherwise result in very weak static stabilities and unrealistically
     ! large values of w_wtg
-    
-    w_wtg(k) = sin(pi*z(k)/ztrop) * (theta_model(k)-theta_ref(k)) * ttheta_wtg / dthetadz
+    theta_diff = theta_model(k)-theta_ref(k)
+    wwtgr(k) = theta_diff * ttheta_wtg / dthetadz
+    w_wtg(k) = sin(pi*z(k)/ztrop) * wwtgr(k)
 
   end do
   do k = 1,(kbl-1)
+    wwtgr(k) = wwtgr(kbl) * z(k) / z(kbl)
     w_wtg(k) = w_wtg(kbl) * z(k) / z(kbl)
   end do
 else
@@ -120,13 +124,16 @@ else
     ! According to Raymond and Zeng (2005) model feedbacks in the upper troposphere can
     ! otherwise result in very weak static stabilities and unrealistically
     ! large values of w_wtg
-    
-    w_wtg(k) = sin(pi*z(k)/ztrop) * (theta_model(k)-theta_ref(k)) * ttheta_wtg / dthetadz
+    theta_diff = theta_model(k)-theta_ref(k)
+    wwtgr(k) = theta_diff * ttheta_wtg / dthetadz
+    w_wtg(k) = sin(pi*z(k)/ztrop) * wwtgr(k)
 
   end do
   dthetadz = (theta_model(2)-theta_model(1)) / (z(2) - z(1))
   if (boundstatic.AND.(dthetadz.lt.dthetadz_min)) dthetadz = dthetadz_min
-  w_wtg(1) = sin(pi*z(1)/ztrop) * (theta_model(1)-theta_ref(1)) * ttheta_wtg / dthetadz
+  theta_diff = theta_model(1)-theta_ref(1)
+  wwtgr(1) = theta_diff * ttheta_wtg / dthetadz
+  w_wtg(1) = sin(pi*z(1)/ztrop) * wwtgr(1)
 end if
 
 end subroutine wtg_qjrms2005

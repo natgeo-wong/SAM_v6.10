@@ -74,11 +74,16 @@ subroutine hbuf_conditionals_init(count,trcount)
          'Reference Large-scale W Before Modifications by WTG/Scaling','m/s',0)
   end if
 
+  if(dowtg_raymondzeng_QJRMS2005.OR.dowtg_decomp2022) then
+    call add_to_namelist(count,trcount,'WWTGRAW', &
+         'Raw (Non-Adjusted) Component of the WTG Vertical Velocity',' ',0)
+  end if
+
   if(dowtg_decomp2022) then
-    call add_to_namelist(count,trcount,'WWTG_A', &
-         'Coefficient for Half-Sine Component of the WTG Vertical Velocity',' ',0)
-    call add_to_namelist(count,trcount,'WWTG_B', &
-         'Coefficient for Full-Sine Component of the WTG Vertical Velocity',' ',0)
+    call add_to_namelist(count,trcount,'WWTGHSIN', &
+         'Half-Sine Component of the WTG Vertical Velocity',' ',0)
+    call add_to_namelist(count,trcount,'WWTGFSIN', &
+         'Full-Sine Component of the WTG Vertical Velocity',' ',0)
   end if
 
   !bloss: setup to add an arbitrary number of conditional statistics

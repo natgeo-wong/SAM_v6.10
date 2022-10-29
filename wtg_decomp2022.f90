@@ -27,7 +27,7 @@
 subroutine wtg_decomp2022(masterproc, nzm, nz, z, &
                           theta_ref, theta_model, tabs_model, ttheta_wtg, &
                           ttheta_a, ttheta_b, &
-                          dowtgLBL, boundstatic, dthetadz_min, w_wtg, wwtga, wwtgb)
+                          dowtgLBL, boundstatic, dthetadz_min, w_wtg, wwtgr, wwtga, wwtgb)
 
 implicit none
 
@@ -52,6 +52,7 @@ real, intent(in) :: dthetadz_min   ! if boundstatic = .true., what is the minimu
 
 ! ======= output =======
 real, intent(out) :: w_wtg(nzm) ! WTG large-scale pressure velocity in Pa/s on model levels.
+real, intent(out) :: wwtgr(nzm) ! Raw w_wtg, assuming constant = 1
 real, intent(out) :: wwtga(nzm) ! Coefficient for half-sine decomposition of w_wtg
 real, intent(out) :: wwtgb(nzm) ! Coefficient for full-sine decomposition of w_wtg
 
@@ -130,11 +131,16 @@ if(.NOT.dowtgLBL) then
     ! otherwise result in very weak static stabilities and unrealistically
     ! large values of w_wtg
     theta_diff = theta_model(k)-theta_ref(k)
-    w_wtg(k) = (ttheta_a * a * sin(pi*z(k)  /ztrop) + &
-                ttheta_b * b * sin(pi*z(k)*2/ztrop)) * theta_diff * ttheta_wtg / dthetadz
+    wwtgr(k) = theta_diff * ttheta_wtg / dthetadz
+    wwtga(k) = wwtgr(k) * ttheta_a * a * sin(pi*z(k)  /ztrop)
+    wwtgb(k) = wwtgr(k) * ttheta_b * b * sin(pi*z(k)*2/ztrop)
+    w_wtg(k) = wwtga(k) + wwtgb(k)
 
   end do
   do k = 1,(kbl-1)
+    wwtgr(k) = wwtgr(kbl) * z(k) / z(kbl)
+    wwtga(k) = wwtga(kbl) * z(k) / z(kbl)
+    wwtgb(k) = wwtgb(kbl) * z(k) / z(kbl)
     w_wtg(k) = w_wtg(kbl) * z(k) / z(kbl)
   end do
 else
@@ -146,19 +152,19 @@ else
     ! otherwise result in very weak static stabilities and unrealistically
     ! large values of w_wtg
     theta_diff = theta_model(k)-theta_ref(k)
-    w_wtg(k) = (ttheta_a * a * sin(pi*z(k)  /ztrop) + &
-                ttheta_b * b * sin(pi*z(k)*2/ztrop)) * theta_diff * ttheta_wtg / dthetadz
+    wwtgr(k) = theta_diff * ttheta_wtg / dthetadz
+    wwtga(k) = wwtgr(k) * ttheta_a * a * sin(pi*z(k)  /ztrop)
+    wwtgb(k) = wwtgr(k) * ttheta_b * b * sin(pi*z(k)*2/ztrop)
+    w_wtg(k) = wwtga(k) + wwtgb(k)
 
   end do
   dthetadz = (theta_model(2)-theta_model(1)) / (z(2) - z(1))
   if (boundstatic.AND.(dthetadz.lt.dthetadz_min)) dthetadz = dthetadz_min
-  w_wtg(1) = (ttheta_a * a * sin(pi*z(1)  /ztrop) + &
-              ttheta_b * b * sin(pi*z(1)*2/ztrop)) * theta_diff * ttheta_wtg / dthetadz
+  theta_diff = theta_model(1)-theta_ref(1)
+  wwtgr(1) = theta_diff * ttheta_wtg / dthetadz
+  wwtga(1) = wwtgr(1) * ttheta_a * a * sin(pi*z(1)  /ztrop)
+  wwtgb(1) = wwtgr(1) * ttheta_b * b * sin(pi*z(1)*2/ztrop)
+  w_wtg(1) = wwtga(1) + wwtgb(1)
 end if
-
-do k = 1,nzm
-  wwtga(k) = a
-  wwtgb(k) = b
-end do
 
 end subroutine wtg_decomp2022
