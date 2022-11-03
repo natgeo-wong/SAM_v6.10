@@ -131,7 +131,7 @@ if(.NOT.dowtgLBL) then
     ! otherwise result in very weak static stabilities and unrealistically
     ! large values of w_wtg
     theta_diff = theta_model(k)-theta_ref(k)
-    wwtgr(k) = theta_diff * ttheta_wtg / dthetadz
+    wwtgr(k) = ttheta_wtg / dthetadz
     wwtga(k) = wwtgr(k) * ttheta_a * a * sin(pi*z(k)  /ztrop)
     wwtgb(k) = wwtgr(k) * ttheta_b * b * sin(pi*z(k)*2/ztrop)
     w_wtg(k) = wwtga(k) + wwtgb(k)
@@ -152,7 +152,7 @@ else
     ! otherwise result in very weak static stabilities and unrealistically
     ! large values of w_wtg
     theta_diff = theta_model(k)-theta_ref(k)
-    wwtgr(k) = theta_diff * ttheta_wtg / dthetadz
+    wwtgr(k) = ttheta_wtg / dthetadz
     wwtga(k) = wwtgr(k) * ttheta_a * a * sin(pi*z(k)  /ztrop)
     wwtgb(k) = wwtgr(k) * ttheta_b * b * sin(pi*z(k)*2/ztrop)
     w_wtg(k) = wwtga(k) + wwtgb(k)
@@ -161,7 +161,7 @@ else
   dthetadz = (theta_model(2)-theta_model(1)) / (z(2) - z(1))
   if (boundstatic.AND.(dthetadz.lt.dthetadz_min)) dthetadz = dthetadz_min
   theta_diff = theta_model(1)-theta_ref(1)
-  wwtgr(1) = theta_diff * ttheta_wtg / dthetadz
+  wwtgr(1) = ttheta_wtg / dthetadz
   wwtga(1) = wwtgr(1) * ttheta_a * a * sin(pi*z(1)  /ztrop)
   wwtgb(1) = wwtgr(1) * ttheta_b * b * sin(pi*z(1)*2/ztrop)
   w_wtg(1) = wwtga(1) + wwtgb(1)
