@@ -156,5 +156,6 @@ real:: dthetadz_min = 1.e-3 ! if boundstatic = .true., what is the minimum bound
 logical :: dooceantimeperturb = .false.
 real, dimension(5) :: tabs_ptscale = (/0., 0., 0., 0., 0./) ! Vector of sinusoidal periods, units in days
 real, dimension(5) :: tabs_pamp    = (/0., 0., 0., 0., 0./) ! Vector of sinusoidal amplitudes, units in K
+real, dimension(5) :: tabs_pphase  = (/0., 0., 0., 0., 0./) ! Vector of sinusoidal amplitudes, units in K
 
 end module params
