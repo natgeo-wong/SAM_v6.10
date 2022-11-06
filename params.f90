@@ -160,4 +160,9 @@ real:: dthetadz_min = 1.e-3 ! if boundstatic = .true., what is the minimum bound
 logical:: doradtendency = .false. ! Radiative tendencies as per Pauluis & Garner [2006]
 real:: troptend = 1.5 ! Convective tendency in Pauluis & Garner [2006]
 
+logical :: dooceantimeperturb = .false.
+real, dimension(5) :: tabs_ptscale = (/0., 0., 0., 0., 0./) ! Vector of sinusoidal periods, units in days
+real, dimension(5) :: tabs_pamp    = (/0., 0., 0., 0., 0./) ! Vector of sinusoidal amplitudes, units in K
+real, dimension(5) :: tabs_pphase  = (/0., 0., 0., 0., 0./) ! Vector of sinusoidal amplitudes, units in K
+
 end module params

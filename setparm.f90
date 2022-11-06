@@ -75,7 +75,8 @@ NAMELIST /UWOPTIONS/ rad_simple_fluxdiv1, &
 ! Options added by Kuang Lab at Harvard
 NAMELIST /KUANG_OPTIONS/ dompiensemble, doradtendency, troptend, &
             dowtg_raymondzeng_QJRMS2005, dowtg_daleuetal_JAMES2015, dowtg_decomp2022, dowtgLBL, &
-            boundstatic, ttheta_wtg, ttheta_a, ttheta_b, ttheta_tscale, dthetadz_min
+            boundstatic, ttheta_wtg, ttheta_a, ttheta_b, ttheta_tscale, dthetadz_min, &
+            dooceantimeperturb, tabs_ptscale, tabs_pamp, tabs_pphase
 
 !bloss: Create dummy namelist, so that we can figure out error code
 !       for a mising namelist.  This lets us differentiate between
