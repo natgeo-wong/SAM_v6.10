@@ -13,7 +13,9 @@ use instrument_diagnostics, only: zero_instr_diag
 use grid, only: dompi
 implicit none
 
-integer icondavg, ierr, ios_uw, ios_kuang, ios_missing_namelist, place_holder
+integer icondavg, ierr, ios_uw, ios_kuang, ios_missing_namelist, place_holder, dowtg_num
+
+real ttheta_tot
 
 NAMELIST /PARAMETERS/ dodamping, doupperbound, docloud, doprecip, &
                 dolongwave, doshortwave, dosgs, dz, doconstdz, &
@@ -72,8 +74,8 @@ NAMELIST /UWOPTIONS/ rad_simple_fluxdiv1, &
 
 ! Options added by Kuang Lab at Harvard
 NAMELIST /KUANG_OPTIONS/ dompiensemble, doradtendency, troptend, &
-            dowtg_raymondzeng_QJRMS2005, boundstatic, ttheta_wtg, ttheta_tscale, &
-            dthetadz_min, &
+            dowtg_raymondzeng_QJRMS2005, dowtg_daleuetal_JAMES2015, dowtg_decomp2022, dowtgLBL, &
+            boundstatic, ttheta_wtg, ttheta_a, ttheta_b, ttheta_tscale, dthetadz_min, &
             dooceantimeperturb, tabs_ptscale, tabs_pamp, tabs_pphase
 
 !bloss: Create dummy namelist, so that we can figure out error code
@@ -258,26 +260,47 @@ end if
         !===============================================================
         ! Weak Temperature Gradient Approximation Schemes
 
-        if(dowtg_blossey_etal_JAMES2009.AND.dowtg_raymondzeng_QJRMS2005) then
-          if(masterproc) then
-            write(*,*) '********************************************************'
-            write(*,*) '  Both WTG schemes (based on Blossey et al. [2009] and'
-            write(*,*) '  Raymond and Zeng [2005]) have been called.  Please'
-            write(*,*) '  select only one of these schemes to use.'
-            write(*,*) '********************************************************'
-          end if
-          call task_abort()
-        end if
+        dowtg_num = 0
 
         if(dowtg_blossey_etal_JAMES2009) then
           if(masterproc) write(*,*) 'WTG (based on BBW09 in JAMES) is being used'
           am_wtg = am_wtg/86400. ! convert from 1/d to 1/s.
+          dowtg_num = dowtg_num + 1
         end if
 
         if(dowtg_raymondzeng_QJRMS2005) then
           if(masterproc) write(*,*) 'WTG (based on Raymond and Zeng [2005]) is being used'
           ttheta_wtg = ttheta_wtg * 3600. ! convert from units of hours to units of sec.
           ttheta_wtg = 1 / ttheta_wtg      ! convert from sec to sec^-1
+          dowtg_num = dowtg_num + 1
+        end if
+
+        if(dowtg_daleuetal_JAMES2015) then
+          if(masterproc) write(*,*) 'WTG (based on Daleu et al. [2015]) is being used'
+          ttheta_wtg = ttheta_wtg * 3600. ! convert from units of hours to units of sec.
+          ttheta_wtg = 1 / ttheta_wtg      ! convert from sec to sec^-1
+          dowtg_num = dowtg_num + 1
+        end if
+
+        if(dowtg_decomp2022) then
+          if(masterproc) write(*,*) 'WTG (Spectral Decomposition into half- and full-sine) is being used'
+          ttheta_wtg = ttheta_wtg * 3600. ! convert from units of hours to units of sec.
+          ttheta_wtg = 1 / ttheta_wtg      ! convert from sec to sec^-1
+
+          ttheta_tot = ttheta_a + ttheta_b
+          ttheta_a = ttheta_a / ttheta_tot
+          ttheta_b = ttheta_b / ttheta_tot
+          dowtg_num = dowtg_num + 1
+        end if
+
+        if(dowtg_num.GT.1) then
+          if(masterproc) then
+            write(*,*) '********************************************************'
+            write(*,*) '  More than one of the available WTG schemes has been'
+            write(*,*) '  called.  Please select only one of these schemes to use.'
+            write(*,*) '********************************************************'
+          end if
+          call task_abort()
         end if
 
         !===============================================================
