@@ -12,6 +12,7 @@ use movies, only: init_movies
 use mse, only: init_MSE_tendency, compute_and_increment_MSE_tendency, &
      init_momentum_tendency, compute_and_increment_momentum_tendency, &
      initializeMSE
+use simple_ocean, only: sst_perturb
 implicit none
 
 integer k, icyc, nn, nstatsteps
@@ -153,6 +154,11 @@ do while(nstep.lt.nstop.and.nelapse.gt.0)
      !bloss:make special statistics flag for radiation,since it's only updated at icycle==1.
      dostatisrad = .false.
      if(mod(nstep,nstatis).eq.0.and.icycle.eq.1) dostatisrad = .true.
+
+!---------------------------------------------
+!    Perturb ocean SST in time sinusoidally around mean SST
+
+     if(.not.dosfcforcing.and.dooceantimeperturb) call sst_perturb()
 
 !---------------------------------------------
 !  	the Adams-Bashforth scheme in time

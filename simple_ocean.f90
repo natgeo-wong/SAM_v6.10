@@ -143,5 +143,46 @@ SUBROUTINE sst_evolve
 
 end subroutine sst_evolve
 
+SUBROUTINE sst_perturb()
+
+! This subroutine allows the user to define time-varying perturbations to fixed-sst
+! scenarios, which can be used to simulate temporal cycles at different scales.
+
+  use vars, only: sstxy,t00
+  use params, only: ocean_type, tabs_s, tabs_ptscale, tabs_pamp, tabs_pphase
+
+! parameters of the sinusoidal SST destribution 
+! along the X for Walker-type simulatons( ocean-type = 1):
+
+  real(8) sec2day, tpert
+  integer itp
+  real, parameter :: pi = 3.141592653589793 ! from MATLAB, format long.
+
+  select case (ocean_type)
+
+    case(0) ! fixed constant SST
+      
+      tpert = 0
+      sec2day  = 2 * pi / 86400
+
+      do itp=1,5
+        if(tabs_ptscale(itp).NE.0) then
+          tpert = tpert + tabs_pamp(itp) * sin(time*sec2day/tabs_ptscale(itp) + tabs_pphase(itp)*2*pi)
+        end if
+      end do
+
+      sstxy = tabs_s - t00 + tpert
+
+    case default
+
+      if(masterproc) then
+        print*, 'This user-defined function for time-perturbation of sea surface temperature on works for ocean_types with homogeneous SST ...'
+        call task_abort
+      end if
+
+  end select
+
+end subroutine sst_perturb
+
 
 end module simple_ocean
