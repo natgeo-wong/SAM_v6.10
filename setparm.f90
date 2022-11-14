@@ -287,9 +287,11 @@ end if
           ttheta_wtg = ttheta_wtg * 3600. ! convert from units of hours to units of sec.
           ttheta_wtg = 1 / ttheta_wtg      ! convert from sec to sec^-1
 
-          ttheta_tot = ttheta_a + ttheta_b
-          ttheta_a = ttheta_a / ttheta_tot
-          ttheta_b = ttheta_b / ttheta_tot
+          if(ttheta_a.gt.1) ttheta_a = 1
+          if(ttheta_b.gt.1) ttheta_b = 1
+          if(ttheta_a.lt.0) ttheta_a = 0
+          if(ttheta_b.lt.0) ttheta_b = 0
+
           dowtg_num = dowtg_num + 1
         end if
 
