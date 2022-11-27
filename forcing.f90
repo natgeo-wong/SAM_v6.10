@@ -306,16 +306,16 @@ if(dolargescale.and.time.gt.timelargescale) then
 
   if (dowtg_raymondzeng_QJRMS2005.OR.dowtg_daleuetal_JAMES2015.OR.dowtg_decomp2022) then
 
-    if(ttheta_tscale.gt.0) then
-      twtgmax = (nstop * dt - timelargescale) * am_tscale
+    if(tau_tscale.gt.0) then
+      twtgmax = (nstop * dt - timelargescale) * tau_tscale
       twtg = time-timelargescale
       if(twtg.gt.twtgmax) then
-        ttheta_wtg_time = ttheta_wtg
+        tau_wtg_time = tau_wtg
       else
-        ttheta_wtg_time = ttheta_wtg * twtg / twtgmax
+        tau_wtg_time = tau_wtg * twtg / twtgmax
       endif
     else
-      ttheta_wtg_time = ttheta_wtg
+      tau_wtg_time = tau_wtg
     endif
 
     do k = 1,nzm
@@ -323,12 +323,14 @@ if(dolargescale.and.time.gt.timelargescale) then
     end do
 
     if (dowtg_raymondzeng_QJRMS2005) call wtg_qjrms2005(masterproc, nzm, nz, z, &
-                        tp0, tpm, tabs0, ttheta_wtg_time, dowtgLBL, boundstatic, dthetadz_min, w_wtg, wwtgr)
+                        tp0, tpm, tabs0, tau_wtg_time, dowtgLBL, boundstatic, &
+                        dthetadz_min, w_wtg, wwtgr)
     if (dowtg_daleuetal_JAMES2015)   call wtg_james2015(masterproc, nzm, nz, z, &
-                        tp0, tpm, tabs0, ttheta_wtg_time, boundstatic, dthetadz_min, w_wtg)
+                        tp0, tpm, tabs0, tau_wtg_time, boundstatic, dthetadz_min, w_wtg)
     if (dowtg_decomp2022)            call wtg_decomp2022(masterproc, nzm, nz, z, &
-                        tp0, tpm, tabs0, ttheta_wtg_time, ttheta_a, ttheta_b, dowtgLBL, boundstatic, &
-                        dthetadz_min, w_wtg, wwtgr, wwtga, wwtgb)
+                        tp0, tpm, tabs0, tau_wtg_time, tauscale_h, tauscale_f, &
+                        dowtgLBL, boundstatic, dthetadz_min, w_wtg, wwtgr, &
+                        wwtgh, wwtgf, wwtgc)
 
     wsub(1:nzm) = wsub(1:nzm) + w_wtg(1:nzm)
 

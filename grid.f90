@@ -237,8 +237,9 @@ logical :: compute_advection_everywhere = .false.
 real :: wsub_ref(nz) = 0. ! used to output reference large-scale vertical motion
 real :: w_wtg(nz) ! for statistics output
 real :: wwtgr(nz) ! for statistics output
-real :: wwtga(nz) ! for statistics output
-real :: wwtgb(nz) ! for statistics output
+real :: wwtgh(nz) ! for statistics output
+real :: wwtgf(nz) ! for statistics output
+real :: wwtgc(nz) = 0. ! for statistics output
 
 logical :: dowtg_blossey_etal_JAMES2009 = .false. ! alternate implementation
 

@@ -84,6 +84,8 @@ subroutine hbuf_conditionals_init(count,trcount)
          'Half-Sine Component of the WTG Vertical Velocity',' ',0)
     call add_to_namelist(count,trcount,'WWTGFSIN', &
          'Full-Sine Component of the WTG Vertical Velocity',' ',0)
+    call add_to_namelist(count,trcount,'WWTGCOEF', &
+         'WTG Vertical Velocity Component Coefficients',' ',0)
   end if
 
   !bloss: setup to add an arbitrary number of conditional statistics

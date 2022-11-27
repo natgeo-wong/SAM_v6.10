@@ -151,10 +151,10 @@ logical:: dowtg_decomp2022 = .false.
 logical:: dowtgLBL = .false.
 logical:: boundstatic = .true. ! Restrict the static stability lower bound to prevent unrealistically large values of w_wtg
 
-real:: ttheta_wtg = 1. ! Relaxation timescale (in hours) for WTG Approximation of Raymond and Zeng [2005]
-real:: ttheta_tscale = 0. ! period over which theta relaxation timescale scales from infinity to ttheta_wtg.  Express as fraction of time over which WTG large-scale forcing is implemented.  So if WTG/Large-scale is turned on for 100 days, twtg_scale = 1/4 means that the scaling up to WTG occurs over 25 days.
-real:: ttheta_a = 1. ! adjustment coefficient for half-sine curve
-real:: ttheta_b = 0. ! adjustment coefficient for full-sine curve
+real:: tau_wtg = 1. ! Relaxation timescale (in hours) for WTG Approximation of Raymond and Zeng [2005]
+real:: tau_tscale = 0. ! period over which theta relaxation timescale scales from infinity to ttheta_wtg.  Express as fraction of time over which WTG large-scale forcing is implemented.  So if WTG/Large-scale is turned on for 100 days, twtg_scale = 1/4 means that the scaling up to WTG occurs over 25 days.
+real:: tauscale_h = 1. ! adjustment coefficient for half-sine curve
+real:: tauscale_f = 0. ! adjustment coefficient for full-sine curve
 real:: dthetadz_min = 1.e-3 ! if boundstatic = .true., what is the minimum bound? Default from Raymond & Zeng [2005] is 1.e-3 K/km
 
 logical:: doradtendency = .false. ! Radiative tendencies as per Pauluis & Garner [2006]
