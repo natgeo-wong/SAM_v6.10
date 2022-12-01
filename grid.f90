@@ -239,7 +239,7 @@ real :: w_wtg(nz) ! for statistics output
 real :: wwtgr(nz) ! for statistics output
 real :: wwtgh(nz) ! for statistics output
 real :: wwtgf(nz) ! for statistics output
-real :: wwtgc(nz) = 0. ! for statistics output
+real :: wwtgc(nz) ! for statistics output
 
 logical :: dowtg_blossey_etal_JAMES2009 = .false. ! alternate implementation
 

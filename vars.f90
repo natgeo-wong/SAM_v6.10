@@ -266,7 +266,7 @@ real cloudtopheight(nx,ny), echotopheight(nx,ny), cloudtoptemp(nx,ny)
 real twtg
 real twtgmax
 real :: am_wtg_time
-real :: ttheta_wtg_time
+real :: tau_wtg_time
 
 logical :: IsInitializedRestartFilename = .false.
 CHARACTER(LEN=256) :: RestartFilename, RestartFilenameSave

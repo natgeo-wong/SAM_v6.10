@@ -75,7 +75,7 @@ NAMELIST /UWOPTIONS/ rad_simple_fluxdiv1, &
 ! Options added by Kuang Lab at Harvard
 NAMELIST /KUANG_OPTIONS/ dompiensemble, doradtendency, troptend, &
             dowtg_raymondzeng_QJRMS2005, dowtg_daleuetal_JAMES2015, dowtg_decomp2022, dowtgLBL, &
-            boundstatic, ttheta_wtg, ttheta_a, ttheta_b, ttheta_tscale, dthetadz_min, &
+            boundstatic, tau_wtg, tauscale_h, tauscale_f, tau_tscale, dthetadz_min, &
             dooceantimeperturb, tabs_ptscale, tabs_pamp, tabs_pphase
 
 !bloss: Create dummy namelist, so that we can figure out error code
@@ -270,27 +270,27 @@ end if
 
         if(dowtg_raymondzeng_QJRMS2005) then
           if(masterproc) write(*,*) 'WTG (based on Raymond and Zeng [2005]) is being used'
-          ttheta_wtg = ttheta_wtg * 3600. ! convert from units of hours to units of sec.
-          ttheta_wtg = 1 / ttheta_wtg      ! convert from sec to sec^-1
+          tau_wtg = tau_wtg * 3600. ! convert from units of hours to units of sec.
+          tau_wtg = 1 / tau_wtg      ! convert from sec to sec^-1
           dowtg_num = dowtg_num + 1
         end if
 
         if(dowtg_daleuetal_JAMES2015) then
           if(masterproc) write(*,*) 'WTG (based on Daleu et al. [2015]) is being used'
-          ttheta_wtg = ttheta_wtg * 3600. ! convert from units of hours to units of sec.
-          ttheta_wtg = 1 / ttheta_wtg      ! convert from sec to sec^-1
+          tau_wtg = tau_wtg * 3600. ! convert from units of hours to units of sec.
+          tau_wtg = 1 / tau_wtg      ! convert from sec to sec^-1
           dowtg_num = dowtg_num + 1
         end if
 
         if(dowtg_decomp2022) then
           if(masterproc) write(*,*) 'WTG (Spectral Decomposition into half- and full-sine) is being used'
-          ttheta_wtg = ttheta_wtg * 3600. ! convert from units of hours to units of sec.
-          ttheta_wtg = 1 / ttheta_wtg      ! convert from sec to sec^-1
+          tau_wtg = tau_wtg * 3600. ! convert from units of hours to units of sec.
+          tau_wtg = 1 / tau_wtg      ! convert from sec to sec^-1
 
-          if(ttheta_a.gt.1) ttheta_a = 1
-          if(ttheta_b.gt.1) ttheta_b = 1
-          if(ttheta_a.lt.0) ttheta_a = 0
-          if(ttheta_b.lt.0) ttheta_b = 0
+          if(tauscale_h.gt.1) tauscale_h = 1
+          if(tauscale_f.gt.1) tauscale_f = 1
+          if(tauscale_h.lt.0) tauscale_h = 0
+          if(tauscale_f.lt.0) tauscale_f = 0
 
           dowtg_num = dowtg_num + 1
         end if
