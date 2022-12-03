@@ -1306,24 +1306,27 @@ real :: relhobs(nzm)
         !   As of Feb 2016, this includes the ISCCP, MODIS and MISR
         !   simulators from COSP v1.4.
         call compute_instr_diags()
-        ! add output for WTG vertical velocity
-        if(dowtg_blossey_etal_JAMES2009.OR.dowtg_raymondzeng_QJRMS2005.OR.dowtg_daleuetal_JAMES2015.OR.dowtg_decomp2022) then
-          call hbuf_put('WWTG',w_wtg,1.)
-        end if
 
         ! add output for reference large-scale vertical velocity
-        if(dowtg_blossey_etal_JAMES2009.OR.dowtg_raymondzeng_QJRMS2005.OR.dowtg_daleuetal_JAMES2015.OR.dowtg_decomp2022) then
+        if(dodgw.OR.dotgr) then
+		  call hbuf_put('WWTG',w_wtg,1.)
           call hbuf_put('WOBSREF',wsub_ref,1.)
         end if
 
-		if(dowtg_raymondzeng_QJRMS2005.OR.dowtg_decomp2022) then
+		if(dodgw) then
+		  call hbuf_put('OWTG',o_wtg,1.)
+		end if
+
+		if(dowtg_raymondzeng_QJRMS2005.OR.dowtg_decomptgr) then
           call hbuf_put('WWTGRAW',wwtgr,1.)
         end if
 
-		if(dowtg_decomp2022) then
-          call hbuf_put('WWTGHSIN',wwtgh,1.)
-          call hbuf_put('WWTGFSIN',wwtgf,1.)
-          call hbuf_put('WWTGCOEF',wwtgc,1.)
+		if(dowtg_decompdgw) then
+		  call hbuf_put('OWTGRAW',owtgr,1.)
+        end if
+
+		if(dowtg_decomp) then
+		  call hbuf_put('WTGCOEF',wwtgc,1.)
         end if
 
 !---------------------------------------------------------

@@ -24,11 +24,11 @@
 !   upwards as in SAM, the model for which this routine was first
 !   written.
 
-subroutine wtg_decomp2022(masterproc, nzm, nz, z, &
+subroutine wtg_decomptgr(masterproc, nzm, nz, z, &
                           theta_ref, theta_model, tabs_model, tau_wtg, &
-                          tau_h, tau_f, &
-                          dowtgLBL, boundstatic, dthetadz_min, w_wtg, &
-                          wwtgr, wwtgh, wwtgf, wwtgc)
+                          wtgscale_vertmodenum, wtgscale_vertmodescl, &
+                          dowtgLBL, boundstatic, dthetadz_min, &
+                          w_wtg, wwtgr, wwtgc)
 
 implicit none
 
@@ -44,19 +44,16 @@ real, intent(in) :: tabs_model(nzm) ! model temperature profile in K (domain-mea
 ! WTG potential temperature relaxation timescale (tau_wtg)
 !   default is 1 day^-1 (tau_wtg = 1/86400 s^-1)
 real, intent(in) :: tau_wtg ! potential temperature relaxation timescale (s^-1)
-real, intent(in) :: tau_h ! potential temperature relaxation timescale (s^-1)
-real, intent(in) :: tau_f ! potential temperature relaxation timescale (s^-1)
+real, intent(in) :: wtgscale_vertmodenum ! response scaling for 1st vertical mode
+real, intent(in) :: wtgscale_vertmodescl ! response scaling for 2nd vertical mode
 
-logical, intent(in) :: dowtgLBL    ! Calculate w_wtg at boundary layer instead of linear interpolation
 logical, intent(in) :: boundstatic ! Restrict lower bound for static stability
 real, intent(in) :: dthetadz_min   ! if boundstatic = .true., what is the minimum bound?
 
 ! ======= output =======
 real, intent(out) :: w_wtg(nzm) ! WTG large-scale pressure velocity in Pa/s on model levels.
 real, intent(out) :: wwtgr(nzm) ! Raw w_wtg, assuming constant = 1
-real, intent(out) :: wwtgh(nzm) ! Half-sine component of w_wtg
-real, intent(out) :: wwtgf(nzm) ! Full-sine component of w_wtg
-real, intent(out) :: wwtgc(nzm) ! Coefficient for the decompositions
+real, intent(out) :: wwtgc(nz) ! Coefficient for the decompositions
 
 
 ! ======= local variables =======
@@ -65,11 +62,10 @@ integer :: ktrop
 integer :: kbl
 real :: min_temp ! temporary variable used to find cold point of model sounding.
 real :: ztrop ! Height of tropopause level (m)
-real :: dthetadz ! Static Stability
 real, parameter :: pi = 3.141592653589793 ! from MATLAB, format long.
-real :: theta_diff ! Static Stability
-real :: ttheta_h ! decomposition constant into half-sine curve
-real :: ttheta_f ! decomposition constant into full-sine curve
+real :: thetad1 ! Static Stability
+real :: thetad2 ! Static Stability
+real :: dthetadz(nzm) ! virtual temperature of model sounding in K
 
 if (z(nz) < 1.e4) then
 
@@ -108,67 +104,61 @@ if(.NOT.dowtgLBL) then
   end do
 end if
 
-ttheta_h = (theta_model(kbl)-theta_ref(kbl)) * sin(pi*z(kbl)  /ztrop) * z(kbl)
-ttheta_f = (theta_model(kbl)-theta_ref(kbl)) * sin(pi*z(kbl)*2/ztrop) * z(kbl)
+! ===== calculate static stability up to ztrop =====
 
-do k = (kbl+1),ktrop
+dthetadz(1) = (theta_model(2)-theta_model(1)) / (z(2)-z(1))
+if (boundstatic.AND.(dthetadz(1).lt.dthetadz_min).AND.(z(k)>5000)) dthetadz(1) = dthetadz_min
+do k = 2,ktrop
+  dthetadz(k) = (theta_model(k+1)-theta_model(k-1)) / (z(k+1)-z(k-1))
+  if (boundstatic.AND.(dthetadz(k).lt.dthetadz_min).AND.(z(k)>5000)) dthetadz(k) = dthetadz_min
+end do
 
-  ttheta_h = ttheta_h + ((theta_model(k)   - theta_ref(k))   * sin(pi*z(k)  /ztrop)  &
-                      +  (theta_model(k-1) - theta_ref(k-1)) * sin(pi*z(k-1)/ztrop)) &
-                      *  (z(k)-z(k-1))
+! ===== calculate vertical mode coefficients =====
 
-  ttheta_f = ttheta_f + ((theta_model(k)   - theta_ref(k))   * sin(pi*z(k)*2  /ztrop)  &
-                      +  (theta_model(k-1) - theta_ref(k-1)) * sin(pi*z(k-1)*2/ztrop)) &
-                      *  (z(k)-z(k-1))
+thetad1 = (theta_model(1) - theta_ref(1)) / dthetadz(1)
+do inum = 1,wtgscale_vertmodenum
+  wwtgc(inum) = thetad * sin(pi*z(1)*inum/ztrop) * z(1)
+end do
+
+do k = 2,ktrop
+
+  thetad1 = (theta_model(k)   - theta_ref(k))   / dthetadz(k)
+  thetad2 = (theta_model(k-1) - theta_ref(k-1)) / dthetadz(k-1)
+  do inum = 1,wtgscale_vertmodenum
+    wwtgc(inum) = wwtgc(inum) + &
+                  (thetad1*sin(pi*z(k)*inum/ztrop) + thetad2*sin(pi*z(k)*inum/ztrop)) * &
+                  (z(k)-z(k-1))
+  end do
 
 end do
 
-ttheta_h = ttheta_h / ztrop
-ttheta_f = ttheta_f / ztrop
+wwtgc = wwtgc / ztrop
+
+do k = 1,ktrop
+
+  w_wtg(k) = 0
+  do inum = 1,wtgscale_vertmodenum
+    w_wtg(k) = w_wtg(k) + &
+               wtgscale_vertmodescl(inum) * wwtgc(inum) * sin(pi*z(k)*inum/ztrop)
+  end do
+
+end do
+
+wwtgc(wtgscale_vertmodenum+1) = ztrop
 
 if(.NOT.dowtgLBL) then
   do k = kbl,ktrop
-
-    dthetadz = (theta_model(k+1)-theta_model(k-1)) / (z(k+1)-z(k-1))
-    if (boundstatic.AND.(dthetadz.lt.dthetadz_min).AND.(z(k)>5000)) dthetadz = dthetadz_min
-    ! According to Raymond and Zeng (2005) model feedbacks in the upper troposphere can
-    ! otherwise result in very weak static stabilities and unrealistically
-    ! large values of w_wtg
-    wwtgr(k) = theta_model(k) - theta_ref(k)           * tau_wtg / dthetadz
-    wwtgh(k) = tau_h * ttheta_h * sin(pi*z(k)  /ztrop) * tau_wtg / dthetadz
-    wwtgf(k) = tau_f * ttheta_f * sin(pi*z(k)*2/ztrop) * tau_wtg / dthetadz
-    w_wtg(k) = wwtgh(k) + wwtgf(k)
-
+    wwtgr(k) = theta_model(k) - theta_ref(k) * tau_wtg / dthetadz(k)
   end do
   do k = 1,(kbl-1)
     wwtgr(k) = wwtgr(kbl) * z(k) / z(kbl)
-    wwtgh(k) = wwtgh(kbl) * z(k) / z(kbl)
-    wwtgf(k) = wwtgf(kbl) * z(k) / z(kbl)
-    w_wtg(k) = w_wtg(kbl) * z(k) / z(kbl)
   end do
 else
-  do k = 2,ktrop
-
-    dthetadz = (theta_model(k+1)-theta_model(k-1)) / (z(k+1)-z(k-1))
-    if (boundstatic.AND.(dthetadz.lt.dthetadz_min)) dthetadz = dthetadz_min
-    ! According to Raymond and Zeng (2005) model feedbacks in the upper troposphere can
-    ! otherwise result in very weak static stabilities and unrealistically
-    ! large values of w_wtg
-    wwtgr(k) = theta_model(k) - theta_ref(k)           * tau_wtg / dthetadz
-    wwtgh(k) = tau_h * ttheta_h * sin(pi*z(k)  /ztrop) * tau_wtg / dthetadz
-    wwtgf(k) = tau_f * ttheta_f * sin(pi*z(k)*2/ztrop) * tau_wtg / dthetadz
-    w_wtg(k) = wwtgh(k) + wwtgf(k)
-
+  do k = 1,ktrop
+    wwtgr(k) = theta_model(k) - theta_ref(k) * tau_wtg / dthetadz(k)
   end do
-  dthetadz = (theta_model(2)-theta_model(1)) / (z(2) - z(1))
-  if (boundstatic.AND.(dthetadz.lt.dthetadz_min)) dthetadz = dthetadz_min
-  wwtgr(1) = theta_model(1) - theta_ref(1)           * tau_wtg / dthetadz
-  wwtgh(1) = tau_h * ttheta_h * sin(pi*z(1)  /ztrop) * tau_wtg / dthetadz
-  wwtgf(1) = tau_f * ttheta_f * sin(pi*z(1)*2/ztrop) * tau_wtg / dthetadz
-  w_wtg(1) = wwtgh(1) + wwtgf(1)
 end if
 
-wwtgc(1) = ttheta_h
-wwtgc(2) = ttheta_f
+wwtgc(wtgscale_vertmodenum+1) = ztrop
 
-end subroutine wtg_decomp2022
+end subroutine wtg_decomptgr

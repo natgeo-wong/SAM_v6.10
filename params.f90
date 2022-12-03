@@ -145,20 +145,27 @@ logical:: dorestart_last_only = .false.
 !!! KUANG_LAB OPTIONS
 logical:: dompiensemble = .false. ! Subdomains defined in domains.f90 are run separately
 
-logical:: dowtg_raymondzeng_QJRMS2005 = .false.
-logical:: dowtg_daleuetal_JAMES2015 = .false.
-logical:: dowtg_decomp2022 = .false.
-logical:: dowtgLBL = .false.
-logical:: boundstatic = .true. ! Restrict the static stability lower bound to prevent unrealistically large values of w_wtg
+! Damped Gravity Wave and Temperature Gradient Relaxation Implementations
+logical :: dodgw = .false.
+logical :: dotgr = .false.
+logical :: dowtg_decomp = .false.
+real :: wtgscale_time = 0. ! period over which theta relaxation timescale scales from infinity to ttheta_wtg.  Express as fraction of time over which WTG large-scale forcing is implemented.  So if WTG/Large-scale is turned on for 100 days, twtg_scale = 1/4 means that the scaling up to WTG occurs over 25 days.
 
-real:: tau_wtg = 1. ! Relaxation timescale (in hours) for WTG Approximation of Raymond and Zeng [2005]
-real:: tau_tscale = 0. ! period over which theta relaxation timescale scales from infinity to ttheta_wtg.  Express as fraction of time over which WTG large-scale forcing is implemented.  So if WTG/Large-scale is turned on for 100 days, twtg_scale = 1/4 means that the scaling up to WTG occurs over 25 days.
-real:: tauscale_h = 1. ! adjustment coefficient for half-sine curve
-real:: tauscale_f = 0. ! adjustment coefficient for full-sine curve
-real:: dthetadz_min = 1.e-3 ! if boundstatic = .true., what is the minimum bound? Default from Raymond & Zeng [2005] is 1.e-3 K/km
+logical :: dowtg_raymondzeng_QJRMS2005 = .false.
+logical :: dowtg_daleuetal_JAMES2015 = .false.
+logical :: dowtg_decompdgw = .false.
+logical :: dowtg_decomptgr = .false.
 
-logical:: doradtendency = .false. ! Radiative tendencies as per Pauluis & Garner [2006]
-real:: troptend = 1.5 ! Convective tendency in Pauluis & Garner [2006]
+real :: tau_wtg = 1. ! Relaxation timescale (in hours) for WTG Approximation of Raymond and Zeng [2005]
+logical :: dowtgLBL = .false.
+logical :: boundstatic = .true. ! Restrict the static stability lower bound to prevent unrealistically large values of w_wtg
+real :: dthetadz_min = 1.e-3 ! if boundstatic = .true., what is the minimum bound? Default from Raymond & Zeng [2005] is 1.e-3 K/km
+
+integer :: wtgscale_vertmodenum = 2 ! adjustment coefficient for first vertical mode
+real, dimension(wtgscale_vertmodenum) :: wtgscale_vertmodescl = (/1., 1./) ! adjustment coefficient for second vertical mode
+
+logical :: doradtendency = .false. ! Radiative tendencies as per Pauluis & Garner [2006]
+real :: troptend = 1.5 ! Convective tendency in Pauluis & Garner [2006]
 
 logical :: dooceantimeperturb = .false.
 real, dimension(5) :: tabs_ptscale = (/0., 0., 0., 0., 0./) ! Vector of sinusoidal periods, units in days
