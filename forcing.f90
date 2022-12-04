@@ -249,7 +249,7 @@ if(dolargescale.and.time.gt.timelargescale) then
 
   if(dodgw) then
 
-    if(am_tscale.gt.0) then
+    if(wtgscale_time.gt.0) then
       twtgmax = (nstop * dt - timelargescale) * wtgscale_time
       twtg = time-timelargescale
       if(twtg.gt.twtgmax) then
@@ -270,7 +270,7 @@ if(dolargescale.and.time.gt.timelargescale) then
         fcor, lambda_wtg, am_wtg_time, am_wtg_exp, owtgr, ktrop)
       call wtg_decompdgw(masterproc, &
         nzm, nz, z, 100.*pg0, tg0, qg0, tabs0, qv0, qn0+qp0, &
-        lambda_wtg, am_wtg_time, wtgscale_vertmodenum, wtgscale_vertmode, &
+        lambda_wtg, am_wtg_time, wtgscale_vertmodenum, wtgscale_vertmodescl, &
         o_wtg, wwtgc, ktrop)
     end if
 
@@ -319,7 +319,7 @@ if(dolargescale.and.time.gt.timelargescale) then
 
   if (dotgr) then
 
-    if(tau_tscale.gt.0) then
+    if(wtgscale_time.gt.0) then
       twtgmax = (nstop * dt - timelargescale) * wtgscale_time
       twtg = time-timelargescale
       if(twtg.gt.twtgmax) then
@@ -342,7 +342,7 @@ if(dolargescale.and.time.gt.timelargescale) then
                         tp0, tpm, tabs0, tau_wtg_time, boundstatic, dthetadz_min, w_wtg)
     if (dowtg_decomptgr)            call wtg_decomptgr(masterproc, nzm, nz, z, &
                         tp0, tpm, tabs0, tau_wtg_time, &
-                        wtgscale_vertmode1, wtgscale_vertmode2, &
+                        wtgscale_vertmodenum, wtgscale_vertmodescl, &
                         dowtgLBL, boundstatic, dthetadz_min, w_wtg, wwtgr, wwtgc)
 
     wsub(1:nzm) = wsub(1:nzm) + w_wtg(1:nzm)

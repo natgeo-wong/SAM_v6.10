@@ -13,7 +13,7 @@ use instrument_diagnostics, only: zero_instr_diag
 use grid, only: dompi
 implicit none
 
-integer icondavg, ierr, ios_uw, ios_kuang, ios_missing_namelist, place_holder, dowtg_num
+integer icondavg, ierr, ios_uw, ios_kuang, ios_missing_namelist, place_holder, dowtg_num, imode
 
 real ttheta_tot
 
@@ -315,7 +315,7 @@ end if
         end if
 
         if (dowtg_decomp) then
-          if(wtgscale_vertmodenum.gt.nzm)
+          if(wtgscale_vertmodenum.gt.nzm) then
             if(masterproc) then
               write(*,*) 'Number of vertical modes specified cannot be greater than nzm'
             end if

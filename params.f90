@@ -161,8 +161,8 @@ logical :: dowtgLBL = .false.
 logical :: boundstatic = .true. ! Restrict the static stability lower bound to prevent unrealistically large values of w_wtg
 real :: dthetadz_min = 1.e-3 ! if boundstatic = .true., what is the minimum bound? Default from Raymond & Zeng [2005] is 1.e-3 K/km
 
-integer, parameter :: wtgscale_vertmodenum = 2 ! number of vertical modes
-real, dimension(wtgscale_vertmodenum) :: wtgscale_vertmodescl = (/1., 1./) ! strength scaling for vertical modes (number of items = wtgscale_vertmodenum)
+integer :: wtgscale_vertmodenum = 2! number of vertical modes
+real, dimension(wtgscale_vertmodenum) :: wtgscale_vertmodescl ! strength scaling for vertical modes (number of items = wtgscale_vertmodenum)
 
 logical :: doradtendency = .false. ! Radiative tendencies as per Pauluis & Garner [2006]
 real :: troptend = 1.5 ! Convective tendency in Pauluis & Garner [2006]
