@@ -123,7 +123,7 @@ do k = 2,ktrop
 
 end do
 
-wwtgc = wwtgc / ztrop * (pi/lambda_wtg/2)**2 * grav**2 / am_wtg / rgas
+wwtgc = wwtgc * ztrop * grav**2 / (lambda_wtg*2)**2 / am_wtg / rgas * -1
 
 do k = 1,ktrop
 
