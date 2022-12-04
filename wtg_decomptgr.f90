@@ -45,8 +45,9 @@ real, intent(in) :: tabs_model(nzm) ! model temperature profile in K (domain-mea
 !   default is 1 day^-1 (tau_wtg = 1/86400 s^-1)
 real, intent(in) :: tau_wtg ! potential temperature relaxation timescale (s^-1)
 real, intent(in) :: wtgscale_vertmodenum ! response scaling for 1st vertical mode
-real, intent(in) :: wtgscale_vertmodescl ! response scaling for 2nd vertical mode
+real, intent(in) :: wtgscale_vertmodescl(wtgscale_vertmodenum) ! response scaling for 2nd vertical mode
 
+logical, intent(in) :: dowtgLBL    ! Calculate w_wtg at boundary layer instead of linear interpolation
 logical, intent(in) :: boundstatic ! Restrict lower bound for static stability
 real, intent(in) :: dthetadz_min   ! if boundstatic = .true., what is the minimum bound?
 
@@ -60,6 +61,7 @@ real, intent(out) :: wwtgc(nz) ! Coefficient for the decompositions
 integer :: k
 integer :: ktrop
 integer :: kbl
+integer :: inum
 real :: min_temp ! temporary variable used to find cold point of model sounding.
 real :: ztrop ! Height of tropopause level (m)
 real, parameter :: pi = 3.141592653589793 ! from MATLAB, format long.
@@ -117,7 +119,7 @@ end do
 
 thetad1 = (theta_model(1) - theta_ref(1)) / dthetadz(1)
 do inum = 1,wtgscale_vertmodenum
-  wwtgc(inum) = thetad * sin(pi*z(1)*inum/ztrop) * z(1)
+  wwtgc(inum) = thetad1 * sin(pi*z(1)*inum/ztrop) * z(1)
 end do
 
 do k = 2,ktrop

@@ -47,7 +47,7 @@ real, intent(in) :: qcond_model(nzm) ! model condensate (liq+ice) sounding in kg
 real, intent(in) :: lambda_wtg ! WTG length scale in m (JAMES2009 value = 650.e6 m)
 real, intent(in) :: am_wtg ! WTG momentum damping rate in 1/s at p/pref (default = 1./86400. /s)
 real, intent(in) :: wtgscale_vertmodenum ! response scaling for 1st vertical mode
-real, intent(in) :: wtgscale_vertmodescl ! response scaling for 2nd vertical mode
+real, intent(in) :: wtgscale_vertmodescl(wtgscale_vertmodenum) ! response scaling for 2nd vertical mode
 
 ! ======= output =======
 real, intent(out) :: w_wtg(nzm) ! WTG large-scale pressure velocity in Pa/s on model levels.
@@ -57,8 +57,8 @@ integer, intent(out) :: ktrop ! index of interface just above the cold point.
 
 ! ======= local variables =======
 integer :: k
-integer :: ktrop
 integer :: kbl
+integer :: inum
 real :: min_temp ! temporary variable used to find cold point of model sounding.
 real :: ztrop ! Height of tropopause level (m)
 real :: dthetadz ! Static Stability
@@ -106,15 +106,15 @@ end do
 
 ! ===== calculate vertical mode coefficients =====
 
-thetad1 = (tv_model(1) - tv_ref(1)) * pres(1) / tabs_ref(1)**2
+thetad1 = (tv_model(1) - tv_ref(1)) * pres_ref(1) / tabs_ref(1)**2
 do inum = 1,wtgscale_vertmodenum
-  wwtgc(inum) = thetad * sin(pi*z(1)*inum/ztrop) * z(1)
+  wwtgc(inum) = thetad1 * sin(pi*z(1)*inum/ztrop) * z(1)
 end do
 
 do k = 2,ktrop
 
-  thetad1 = (tv_model(k)   - tv_ref(k))   * pres(k)   / tabs_ref(k)**2
-  thetad2 = (tv_model(k-1) - tv_ref(k-1)) * pres(k-1) / tabs_ref(k-1)**2
+  thetad1 = (tv_model(k)   - tv_ref(k))   * pres_ref(k)   / tabs_ref(k)**2
+  thetad2 = (tv_model(k-1) - tv_ref(k-1)) * pres_ref(k-1) / tabs_ref(k-1)**2
   do inum = 1,wtgscale_vertmodenum
     wwtgc(inum) = wwtgc(inum) + &
                   (thetad1*sin(pi*z(k)*inum/ztrop) + thetad2*sin(pi*z(k)*inum/ztrop)) * &
