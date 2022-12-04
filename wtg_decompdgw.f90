@@ -104,21 +104,12 @@ do k = 1,ktrop
   tv_ref(k) = tabs_ref(k)*( 1. + 0.61*qv_ref(k) )
 end do
 
-if(masterproc) then
-  write(*,*) tv_model
-  write(*,*) tv_ref
-end if
-
 ! ===== calculate vertical mode coefficients =====
 
 thetad1 = (tv_model(1) - tv_ref(1)) * pres_ref(1) / tabs_ref(1)**2
 do inum = 1,wtgscale_vertmodenum
   wwtgc(inum) = thetad1 * sin(pi*z(1)*inum/ztrop) * z(1)
 end do
-
-if(masterproc) then
-  write(*,*) wwtgc
-end if
 
 do k = 2,ktrop
 
@@ -132,15 +123,7 @@ do k = 2,ktrop
 
 end do
 
-if(masterproc) then
-  write(*,*) wwtgc
-end if
-
 wwtgc = wwtgc / ztrop * (pi/lambda_wtg/2)**2 * grav**2 / am_wtg / rgas
-
-if(masterproc) then
-  write(*,*) wwtgc
-end if
 
 do k = 1,ktrop
 
