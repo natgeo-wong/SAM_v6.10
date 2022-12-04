@@ -315,7 +315,6 @@ end if
         end if
 
         if (dowtg_decomp) then
-          allocate(wtgscale_vertmodescl(wtgscale_vertmodenum))
           if(wtgscale_vertmodenum.gt.nzm) then
             if(masterproc) then
               write(*,*) 'Number of vertical modes specified cannot be greater than nzm'
