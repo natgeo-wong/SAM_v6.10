@@ -134,7 +134,7 @@ do k = 2,ktrop
 
 end do
 
-wwtgc = wwtgc / ztrop
+wwtgc = wwtgc / ztrop * tau_wtg
 
 do k = 1,ktrop
 
@@ -145,8 +145,6 @@ do k = 1,ktrop
   end do
 
 end do
-
-wwtgc(wtgscale_vertmodenum+1) = ztrop
 
 if(.NOT.dowtgLBL) then
   do k = kbl,ktrop
