@@ -77,7 +77,7 @@ NAMELIST /KUANG_OPTIONS/ dompiensemble, doradtendency, troptend, &
             dowtg_raymondzeng_QJRMS2005, dowtg_daleuetal_JAMES2015, &
             wtgscale_time, dowtgLBL, boundstatic, tau_wtg, dthetadz_min, &
             dowtg_decompdgw, dowtg_decomptgr, &
-            wtgscale_vertmodenum, wtgscale_vertmodescl, &
+            wtgscale_vertmodenum, wtgscale_vertmodescl
 
 !bloss: Create dummy namelist, so that we can figure out error code
 !       for a mising namelist.  This lets us differentiate between
@@ -315,6 +315,7 @@ end if
         end if
 
         if (dowtg_decomp) then
+          allocate(wtgscale_vertmodescl(wtgscale_vertmodenum))
           if(wtgscale_vertmodenum.gt.nzm) then
             if(masterproc) then
               write(*,*) 'Number of vertical modes specified cannot be greater than nzm'
