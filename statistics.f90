@@ -1317,16 +1317,17 @@ real :: relhobs(nzm)
 		  call hbuf_put('OWTG',o_wtg,1.)
 		end if
 
-		if(dowtg_raymondzeng_QJRMS2005.OR.dowtg_decomptgr) then
+		if(dowtg_raymondzeng_QJRMS2005) then
           call hbuf_put('WWTGRAW',wwtgr,1.)
-        end if
-
-		if(dowtg_decompdgw) then
-		  call hbuf_put('OWTGRAW',owtgr,1.)
         end if
 
 		if(dowtg_decomp) then
 		  call hbuf_put('WTGCOEF',wwtgc,1.)
+		  call hbuf_put('WWTGRAW',wwtgr,1.)
+        end if
+
+		if(dowtg_decompdgw) then
+		  call hbuf_put('OWTGRAW',owtgr,1.)
         end if
 
 !---------------------------------------------------------

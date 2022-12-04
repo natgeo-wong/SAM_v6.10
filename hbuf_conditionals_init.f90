@@ -77,19 +77,21 @@ subroutine hbuf_conditionals_init(count,trcount)
          'Large-scale Omega induced by weak temperature gradient approx','Pa/s',0)
   end if
 
-  if(dowtg_raymondzeng_QJRMS2005.OR.dowtg_decomptgr) then
+  if(dowtg_raymondzeng_QJRMS2005) then
     call add_to_namelist(count,trcount,'WWTGRAW', &
-         'Raw (Non-Adjusted) Component of the WTG Vertical Velocity',' ',0)
-  end if
-
-  if(dowtg_decompdgw) then
-    call add_to_namelist(count,trcount,'OWTGRAW', &
-         'Raw (Non-Adjusted) Component of the WTG Pressure Velocity','Pa/s',0)
+         'Raw (Non-Adjusted) Component of the WTG Vertical Velocity','m/s',0)
   end if
 
   if(dowtg_decomp) then
     call add_to_namelist(count,trcount,'WTGCOEF', &
          'Coefficients of Vertical Modes for Decomposed WTG Velocities',' ',0)
+    call add_to_namelist(count,trcount,'WWTGRAW', &
+         'Raw (Non-Adjusted) Component of the WTG Vertical Velocity','m/s',0)
+  end if
+
+  if(dowtg_decompdgw) then
+    call add_to_namelist(count,trcount,'OWTGRAW', &
+         'Raw (Non-Adjusted) Component of the WTG Pressure Velocity','Pa/s',0)
   end if
 
   !bloss: setup to add an arbitrary number of conditional statistics
