@@ -136,7 +136,7 @@ if(masterproc) then
   write(*,*) wwtgc
 end if
 
-wwtgc = wwtgc / ztrop * lambda_wtg**2 * grav**2 / am_wtg / rgas
+wwtgc = wwtgc / ztrop * (pi/lambda_wtg/2)**2 * grav**2 / am_wtg / rgas
 
 if(masterproc) then
   write(*,*) wwtgc
