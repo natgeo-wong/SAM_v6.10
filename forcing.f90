@@ -346,7 +346,7 @@ if(dolargescale.and.time.gt.timelargescale) then
                         dowtgLBL, boundstatic, dthetadz_min, w_wtg, wwtgr, wwtgc)
 
     ! convert from omega in Pa/s to wsub in m/s
-    o_wtg(1:nzm) = -o_wtg(1:nzm)*rho(1:nzm)*ggr
+    o_wtg(1:nzm) = -w_wtg(1:nzm)*rho(1:nzm)*ggr
     owtgr(1:nzm) = -wwtgr(1:nzm)*rho(1:nzm)*ggr
 
     wsub(1:nzm) = wsub(1:nzm) + w_wtg(1:nzm)
