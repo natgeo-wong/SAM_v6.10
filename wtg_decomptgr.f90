@@ -148,14 +148,14 @@ end do
 
 if(.NOT.dowtgLBL) then
   do k = kbl,ktrop
-    wwtgr(k) = theta_model(k) - theta_ref(k) * tau_wtg / dthetadz(k)
+    wwtgr(k) = (theta_model(k) - theta_ref(k)) * tau_wtg / dthetadz(k)
   end do
   do k = 1,(kbl-1)
     wwtgr(k) = wwtgr(kbl) * z(k) / z(kbl)
   end do
 else
   do k = 1,ktrop
-    wwtgr(k) = theta_model(k) - theta_ref(k) * tau_wtg / dthetadz(k)
+    wwtgr(k) = (theta_model(k) - theta_ref(k)) * tau_wtg / dthetadz(k)
   end do
 end if
 

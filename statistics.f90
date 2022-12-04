@@ -1310,23 +1310,18 @@ real :: relhobs(nzm)
         ! add output for reference large-scale vertical velocity
         if(dodgw.OR.dotgr) then
 		  call hbuf_put('WWTG',w_wtg,1.)
+		  call hbuf_put('OWTG',o_wtg,1.)
           call hbuf_put('WOBSREF',wsub_ref,1.)
         end if
 
-		if(dodgw) then
-		  call hbuf_put('OWTG',o_wtg,1.)
-		end if
-
 		if(dowtg_raymondzeng_QJRMS2005) then
           call hbuf_put('WWTGRAW',wwtgr,1.)
+		  call hbuf_put('OWTGRAW',owtgr,1.)
         end if
 
 		if(dowtg_decomp) then
 		  call hbuf_put('WTGCOEF',wwtgc,1.)
 		  call hbuf_put('WWTGRAW',wwtgr,1.)
-        end if
-
-		if(dowtg_decompdgw) then
 		  call hbuf_put('OWTGRAW',owtgr,1.)
         end if
 

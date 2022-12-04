@@ -68,18 +68,17 @@ subroutine hbuf_conditionals_init(count,trcount)
   if(dodgw.OR.dotgr) then
     call add_to_namelist(count,trcount,'WWTG', &
          'Large-scale W induced by weak temperature gradient approx','m/s',0)
-    call add_to_namelist(count,trcount,'WOBSREF', &
-         'Reference Large-scale W Before Modifications by WTG/Scaling','m/s',0)
-  end if
-
-  if(dodgw) then
     call add_to_namelist(count,trcount,'OWTG', &
          'Large-scale Omega induced by weak temperature gradient approx','Pa/s',0)
+    call add_to_namelist(count,trcount,'WOBSREF', &
+         'Reference Large-scale W Before Modifications by WTG/Scaling','m/s',0)
   end if
 
   if(dowtg_raymondzeng_QJRMS2005) then
     call add_to_namelist(count,trcount,'WWTGRAW', &
          'Raw (Non-Adjusted) Component of the WTG Vertical Velocity','m/s',0)
+    call add_to_namelist(count,trcount,'OWTGRAW', &
+         'Raw (Non-Adjusted) Component of the WTG Pressure Velocity','Pa/s',0)
   end if
 
   if(dowtg_decomp) then
@@ -87,9 +86,6 @@ subroutine hbuf_conditionals_init(count,trcount)
          'Coefficients of Vertical Modes for Decomposed WTG Velocities',' ',0)
     call add_to_namelist(count,trcount,'WWTGRAW', &
          'Raw (Non-Adjusted) Component of the WTG Vertical Velocity','m/s',0)
-  end if
-
-  if(dowtg_decompdgw) then
     call add_to_namelist(count,trcount,'OWTGRAW', &
          'Raw (Non-Adjusted) Component of the WTG Pressure Velocity','Pa/s',0)
   end if
