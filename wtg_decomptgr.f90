@@ -44,7 +44,7 @@ real, intent(in) :: tabs_model(nzm) ! model temperature profile in K (domain-mea
 ! WTG potential temperature relaxation timescale (tau_wtg)
 !   default is 1 day^-1 (tau_wtg = 1/86400 s^-1)
 real, intent(in) :: tau_wtg ! potential temperature relaxation timescale (s^-1)
-real, intent(in) :: wtgscale_vertmodenum ! response scaling for 1st vertical mode
+integer, intent(in) :: wtgscale_vertmodenum ! response scaling for 1st vertical mode
 real, intent(in) :: wtgscale_vertmodescl(wtgscale_vertmodenum) ! response scaling for 2nd vertical mode
 
 logical, intent(in) :: dowtgLBL    ! Calculate w_wtg at boundary layer instead of linear interpolation

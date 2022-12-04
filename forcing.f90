@@ -261,7 +261,7 @@ if(dolargescale.and.time.gt.timelargescale) then
       am_wtg_time = am_wtg
     endif
 
-    if (dowtg_raymondzeng_QJRMS2005) call wtg_james2009(nzm, &
+    if (dowtg_blossey_etal_JAMES2009) call wtg_james2009(nzm, &
         100.*pres, tg0, qg0, tabs0, qv0, qn0+qp0, &
         fcor, lambda_wtg, am_wtg_time, am_wtg_exp, o_wtg, ktrop)
     if (dowtg_decompdgw) then

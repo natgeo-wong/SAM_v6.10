@@ -46,7 +46,7 @@ real, intent(in) :: qcond_model(nzm) ! model condensate (liq+ice) sounding in kg
 
 real, intent(in) :: lambda_wtg ! WTG length scale in m (JAMES2009 value = 650.e6 m)
 real, intent(in) :: am_wtg ! WTG momentum damping rate in 1/s at p/pref (default = 1./86400. /s)
-real, intent(in) :: wtgscale_vertmodenum ! response scaling for 1st vertical mode
+integer, intent(in) :: wtgscale_vertmodenum ! response scaling for 1st vertical mode
 real, intent(in) :: wtgscale_vertmodescl(wtgscale_vertmodenum) ! response scaling for 2nd vertical mode
 
 ! ======= output =======
@@ -105,6 +105,10 @@ do k = 1,ktrop
 end do
 
 ! ===== calculate vertical mode coefficients =====
+
+if(masterproc) then
+  write(*,*) wtgscale_vertmodenum
+end if
 
 thetad1 = (tv_model(1) - tv_ref(1)) * pres_ref(1) / tabs_ref(1)**2
 do inum = 1,wtgscale_vertmodenum

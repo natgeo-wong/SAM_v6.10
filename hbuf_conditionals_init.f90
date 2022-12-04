@@ -74,7 +74,7 @@ subroutine hbuf_conditionals_init(count,trcount)
 
   if(dodgw) then
     call add_to_namelist(count,trcount,'OWTG', &
-         'Large-scale Omega induced by weak temperature gradient approx','m/s',0)
+         'Large-scale Omega induced by weak temperature gradient approx','Pa/s',0)
   end if
 
   if(dowtg_raymondzeng_QJRMS2005.OR.dowtg_decomptgr) then
@@ -84,7 +84,7 @@ subroutine hbuf_conditionals_init(count,trcount)
 
   if(dowtg_decompdgw) then
     call add_to_namelist(count,trcount,'OWTGRAW', &
-         'Raw (Non-Adjusted) Component of the WTG Pressure Velocity','m/s',0)
+         'Raw (Non-Adjusted) Component of the WTG Pressure Velocity','Pa/s',0)
   end if
 
   if(dowtg_decomp) then
