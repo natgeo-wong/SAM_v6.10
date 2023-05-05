@@ -11,7 +11,7 @@ implicit none
 
 integer i,j,k,n,nn,m,iz,iday0,iday
 real coef, radtend, dayy
-real tt(nzm,2),qq(nzm,2),uu(nzm,2),vv(nzm,2),ww(nzm,2),tp(nzm,2),pp
+real tt(nzm,2),qq(nzm,2),uu(nzm,2),vv(nzm,2),ww(nzm,2),tp(nzm,2),pp(nzm,2)
 real tpm(nzm)
 real ratio1, ratio2, ratio_t1, ratio_t2
 logical zgrid, pgrid
@@ -75,8 +75,8 @@ call t_startf ('forcing')
             coef = (z(iz)-zsnd(i-1,m))/(zsnd(i,m)-zsnd(i-1,m))
             tt(iz,n)=tsnd(i-1,m)+(tsnd(i,m)-tsnd(i-1,m))*coef
             if(pgrid) then
-              pp=psnd(i-1,m)+(psnd(i,m)-psnd(i-1,m))*coef
-              tt(iz,n)=tt(iz,n)/((1000./pp)**(rgas/cp))
+              pp(iz,n)=psnd(i-1,m)+(psnd(i,m)-psnd(i-1,m))*coef
+              tt(iz,n)=tt(iz,n)/((1000./pp(iz,n))**(rgas/cp))
             else
               tt(iz,n)=tt(iz,n)/prespoti(iz)
             endif
@@ -97,6 +97,7 @@ call t_startf ('forcing')
             qq(iz,n)=qsnd(i-1,m)+(qsnd(i,m)-qsnd(i-1,m))*coef
             uu(iz,n)=usnd(i-1,m)+(usnd(i,m)-usnd(i-1,m))*coef
             vv(iz,n)=vsnd(i-1,m)+(vsnd(i,m)-vsnd(i-1,m))*coef
+            pp(iz,n)=psnd(i-1,m)+(psnd(i,m)-psnd(i-1,m))*coef
            goto 11
           endif
         end do
@@ -126,6 +127,7 @@ call t_startf ('forcing')
 ! Note that ug0 and vg0 maybe reset if dolargescale is true)
     ug0(k)=uu(k,1)+(uu(k,2)-uu(k,1))*coef - ug
     vg0(k)=vv(k,1)+(vv(k,2)-vv(k,1))*coef - vg
+    pg0(k)=pp(k,1)+(pp(k,2)-pp(k,1))*coef - vg
    end do
 
    !bloss: Save sounding winds in case we want to nudge to them
@@ -245,10 +247,10 @@ if(dolargescale.and.time.gt.timelargescale) then
    ! modified by WTG or scaling techniques
   wsub_ref(1:nzm) = wsub(1:nzm)
 
-  if(dowtg_blossey_etal_JAMES2009) then
+  if(dodgw) then
 
-    if(am_tscale.gt.0) then
-      twtgmax = (nstop * dt - timelargescale) * am_tscale
+    if(wtgscale_time.gt.0) then
+      twtgmax = (nstop * dt - timelargescale) * wtgscale_time
       twtg = time-timelargescale
       if(twtg.gt.twtgmax) then
         am_wtg_time = am_wtg
@@ -259,11 +261,22 @@ if(dolargescale.and.time.gt.timelargescale) then
       am_wtg_time = am_wtg
     endif
 
-    call wtg_james2009(nzm, 100.*pres, tg0, qg0, tabs0, qv0, qn0+qp0, &
-        fcor, lambda_wtg, am_wtg_time, am_wtg_exp, w_wtg, ktrop)
+    if (dowtg_blossey_etal_JAMES2009) call wtg_james2009(nzm, &
+        100.*pres, tg0, qg0, tabs0, qv0, qn0+qp0, &
+        fcor, lambda_wtg, am_wtg_time, am_wtg_exp, o_wtg, ktrop)
+    if (dowtg_decompdgw) then
+      call wtg_james2009(nzm, &
+        100.*pres, tg0, qg0, tabs0, qv0, qn0+qp0, &
+        fcor, lambda_wtg, am_wtg_time, am_wtg_exp, owtgr, ktrop)
+      call wtg_decompdgw(masterproc, &
+        nzm, nz, z, 100.*pg0, tg0, qg0, tabs0, qv0, qn0+qp0, &
+        lambda_wtg, am_wtg_time, wtgscale_vertmodenum, wtgscale_vertmodescl, &
+        o_wtg, wwtgc, ktrop)
+    end if
 
     ! convert from omega in Pa/s to wsub in m/s
-    w_wtg(1:nzm) = -w_wtg(1:nzm)/rho(1:nzm)/ggr
+    w_wtg(1:nzm) = -o_wtg(1:nzm)/rho(1:nzm)/ggr
+    if (dowtg_decompdgw) wwtgr(1:nzm) = -owtgr(1:nzm)/rho(1:nzm)/ggr
 
     ! add to reference large-scale vertical velocity.
     wsub(1:nzm) = wsub(1:nzm) + w_wtg(1:nzm)
@@ -304,18 +317,18 @@ if(dolargescale.and.time.gt.timelargescale) then
     end if
   end if
 
-  if (dowtg_raymondzeng_QJRMS2005.OR.dowtg_daleuetal_JAMES2015.OR.dowtg_decomp2022) then
+  if (dotgr) then
 
-    if(ttheta_tscale.gt.0) then
-      twtgmax = (nstop * dt - timelargescale) * am_tscale
+    if(wtgscale_time.gt.0) then
+      twtgmax = (nstop * dt - timelargescale) * wtgscale_time
       twtg = time-timelargescale
       if(twtg.gt.twtgmax) then
-        ttheta_wtg_time = ttheta_wtg
+        tau_wtg_time = tau_wtg
       else
-        ttheta_wtg_time = ttheta_wtg * twtg / twtgmax
+        tau_wtg_time = tau_wtg * twtg / twtgmax
       endif
     else
-      ttheta_wtg_time = ttheta_wtg
+      tau_wtg_time = tau_wtg
     endif
 
     do k = 1,nzm
@@ -323,12 +336,18 @@ if(dolargescale.and.time.gt.timelargescale) then
     end do
 
     if (dowtg_raymondzeng_QJRMS2005) call wtg_qjrms2005(masterproc, nzm, nz, z, &
-                        tp0, tpm, tabs0, ttheta_wtg_time, dowtgLBL, boundstatic, dthetadz_min, w_wtg, wwtgr)
+                        tp0, tpm, tabs0, tau_wtg_time, dowtgLBL, boundstatic, &
+                        dthetadz_min, w_wtg, wwtgr)
     if (dowtg_daleuetal_JAMES2015)   call wtg_james2015(masterproc, nzm, nz, z, &
-                        tp0, tpm, tabs0, ttheta_wtg_time, boundstatic, dthetadz_min, w_wtg)
-    if (dowtg_decomp2022)            call wtg_decomp2022(masterproc, nzm, nz, z, &
-                        tp0, tpm, tabs0, ttheta_wtg_time, ttheta_a, ttheta_b, dowtgLBL, boundstatic, &
-                        dthetadz_min, w_wtg, wwtgr, wwtga, wwtgb)
+                        tp0, tpm, tabs0, tau_wtg_time, boundstatic, dthetadz_min, w_wtg)
+    if (dowtg_decomptgr)            call wtg_decomptgr(masterproc, nzm, nz, z, &
+                        tp0, tpm, tabs0, tau_wtg_time, &
+                        wtgscale_vertmodenum, wtgscale_vertmodescl, &
+                        dowtgLBL, boundstatic, dthetadz_min, w_wtg, wwtgr, wwtgc)
+
+    ! convert from omega in Pa/s to wsub in m/s
+    o_wtg(1:nzm) = -w_wtg(1:nzm)*rho(1:nzm)*ggr
+    owtgr(1:nzm) = -wwtgr(1:nzm)*rho(1:nzm)*ggr
 
     wsub(1:nzm) = wsub(1:nzm) + w_wtg(1:nzm)
 

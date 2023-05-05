@@ -51,7 +51,7 @@ real ustar (nx, ny), fluxbq_coef (nx, ny), qsat_surf (nx, ny), u10arr(nx, ny)
 
 real   t0(nzm), q0(nzm), qv0(nzm), tabs0(nzm), tl0(nzm), &
        tv0(nzm), u0(nzm), v0(nzm), &
-       tg0(nzm), tp0(nzm), qg0(nzm), ug0(nzm), vg0(nzm), p0(nzm), &
+       tg0(nzm), tp0(nzm), qg0(nzm), ug0(nzm), vg0(nzm), pg0(nzm), p0(nzm), &
        t01(nzm), q01(nzm), qp0(nzm), qn0(nzm), &
        usounding0(nzm), vsounding0(nzm), tg0_ref(nzm), qg0_ref(nzm), &
        qcldliq0(nzm), qpcpliq0(nzm), qcldice0(nzm), qpcpice0(nzm)
@@ -266,7 +266,7 @@ real cloudtopheight(nx,ny), echotopheight(nx,ny), cloudtoptemp(nx,ny)
 real twtg
 real twtgmax
 real :: am_wtg_time
-real :: ttheta_wtg_time
+real :: tau_wtg_time
 
 logical :: IsInitializedRestartFilename = .false.
 CHARACTER(LEN=256) :: RestartFilename, RestartFilenameSave

@@ -13,7 +13,7 @@ use instrument_diagnostics, only: zero_instr_diag
 use grid, only: dompi
 implicit none
 
-integer icondavg, ierr, ios_uw, ios_kuang, ios_missing_namelist, place_holder, dowtg_num
+integer icondavg, ierr, ios_uw, ios_kuang, ios_missing_namelist, place_holder, dowtg_num, imode
 
 real ttheta_tot
 
@@ -68,15 +68,16 @@ NAMELIST /UWOPTIONS/ rad_simple_fluxdiv1, &
      dowtg_qnudge, itau_wtg_qnudge, &
      dowtg_tnudge, itau_wtg_tnudge,  taulz_wtg_tnudge, &
      tauz0_wtg_qnudge, taulz_wtg_qnudge, &
-     am_wtg, am_wtg_exp, am_tscale, lambda_wtg, nudge_to_sounding_winds, &
+     am_wtg, am_wtg_exp, lambda_wtg, nudge_to_sounding_winds, &
      doSmoothDamping, zbot_SmoothDamping, tau_SmoothDamping, &
      doenforce_cgils_qfloor, ztop_qfloor, qfloor, tau_qfloor
 
 ! Options added by Kuang Lab at Harvard
 NAMELIST /KUANG_OPTIONS/ dompiensemble, doradtendency, troptend, &
-            dowtg_raymondzeng_QJRMS2005, dowtg_daleuetal_JAMES2015, dowtg_decomp2022, dowtgLBL, &
-            boundstatic, ttheta_wtg, ttheta_a, ttheta_b, ttheta_tscale, dthetadz_min, &
-            dooceantimeperturb, tabs_ptscale, tabs_pamp, tabs_pphase
+            dowtg_raymondzeng_QJRMS2005, dowtg_daleuetal_JAMES2015, &
+            wtgscale_time, dowtgLBL, boundstatic, tau_wtg, dthetadz_min, &
+            dowtg_decompdgw, dowtg_decomptgr, &
+            wtgscale_vertmodenum, wtgscale_vertmodescl
 
 !bloss: Create dummy namelist, so that we can figure out error code
 !       for a mising namelist.  This lets us differentiate between
@@ -263,35 +264,34 @@ end if
         dowtg_num = 0
 
         if(dowtg_blossey_etal_JAMES2009) then
-          if(masterproc) write(*,*) 'WTG (based on BBW09 in JAMES) is being used'
-          am_wtg = am_wtg/86400. ! convert from 1/d to 1/s.
+          dodgw = .true.
+          if(masterproc) write(*,*) 'Damped Gravity Wave scheme (based on BBW09 in JAMES) is being used'
+          dowtg_num = dowtg_num + 1
+        end if
+
+        if(dowtg_decompdgw) then
+          dodgw = .true.
+          dowtg_decomp = .true.
+          if(masterproc) write(*,*) 'Damped Gravity Wave scheme (Spectral Decomposition into half- and full-sine) is being used'
           dowtg_num = dowtg_num + 1
         end if
 
         if(dowtg_raymondzeng_QJRMS2005) then
-          if(masterproc) write(*,*) 'WTG (based on Raymond and Zeng [2005]) is being used'
-          ttheta_wtg = ttheta_wtg * 3600. ! convert from units of hours to units of sec.
-          ttheta_wtg = 1 / ttheta_wtg      ! convert from sec to sec^-1
+          dotgr = .true.
+          if(masterproc) write(*,*) 'Temperature Gradient Relaxation scheme (based on Raymond and Zeng [2005]) is being used'
           dowtg_num = dowtg_num + 1
         end if
 
         if(dowtg_daleuetal_JAMES2015) then
-          if(masterproc) write(*,*) 'WTG (based on Daleu et al. [2015]) is being used'
-          ttheta_wtg = ttheta_wtg * 3600. ! convert from units of hours to units of sec.
-          ttheta_wtg = 1 / ttheta_wtg      ! convert from sec to sec^-1
+          dotgr = .true.
+          if(masterproc) write(*,*) 'Temperature Gradient Relaxation scheme (based on Daleu et al. [2015]) is being used'
           dowtg_num = dowtg_num + 1
         end if
 
-        if(dowtg_decomp2022) then
-          if(masterproc) write(*,*) 'WTG (Spectral Decomposition into half- and full-sine) is being used'
-          ttheta_wtg = ttheta_wtg * 3600. ! convert from units of hours to units of sec.
-          ttheta_wtg = 1 / ttheta_wtg      ! convert from sec to sec^-1
-
-          if(ttheta_a.gt.1) ttheta_a = 1
-          if(ttheta_b.gt.1) ttheta_b = 1
-          if(ttheta_a.lt.0) ttheta_a = 0
-          if(ttheta_b.lt.0) ttheta_b = 0
-
+        if(dowtg_decomptgr) then
+          dotgr = .true.
+          dowtg_decomp = .true.
+          if(masterproc) write(*,*) 'Temperature Gradient Relaxation scheme (Spectral Decomposition into half- and full-sine) is being used'
           dowtg_num = dowtg_num + 1
         end if
 
@@ -303,6 +303,27 @@ end if
             write(*,*) '********************************************************'
           end if
           call task_abort()
+        end if
+
+        if (dodgw) then
+          am_wtg = am_wtg/86400. ! convert from 1/d to 1/s.
+        end if
+
+        if (dotgr) then
+          tau_wtg = tau_wtg * 3600. ! convert from units of hours to units of sec.
+          tau_wtg = 1 / tau_wtg      ! convert from sec to sec^-1
+        end if
+
+        if (dowtg_decomp) then
+          if(wtgscale_vertmodenum.gt.nzm) then
+            if(masterproc) then
+              write(*,*) 'Number of vertical modes specified cannot be greater than nzm'
+            end if
+          end if
+          do imode=1,wtgscale_vertmodenum
+            if(wtgscale_vertmodescl(imode).gt.1) wtgscale_vertmodescl(imode) = 1
+            if(wtgscale_vertmodescl(imode).lt.0) wtgscale_vertmodescl(imode) = 0
+          end do
         end if
 
         !===============================================================
