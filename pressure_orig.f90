@@ -19,7 +19,7 @@ integer, parameter :: nzslab = max(1,nzm / npressureslabs)
 integer, parameter :: nx2=nx_gl+2, ny2=ny_gl+2*YES3D
 integer, parameter :: n3i=3*nx_gl/2+1,n3j=3*ny_gl/2+1
 
-real f(nx2,ny2,nzslab) ! global rhs and array for FTP coefficeients
+real(8) f(nx2,ny2,nzslab) ! global rhs and array for FTP coefficeients
 real ff(nx+1,ny+2*YES3D,nzm)	! local (subdomain's) version of f
 real buff_slabs(nxp1,nyp2,nzslab,npressureslabs)
 real buff_subs(nxp1,nyp2,nzslab,nsubdomains) 
@@ -29,7 +29,7 @@ common/tmpstack/f,ff,buff_slabs,buff_subs
 equivalence (buff_slabs,bufp_slabs)
 equivalence (buff_subs,bufp_subs)
 
-real work(nx2,ny2),trigxi(n3i),trigxj(n3j) ! FFT stuff
+real(8) work(nx2,ny2),trigxi(n3i),trigxj(n3j) ! FFT stuff
 integer ifaxj(100),ifaxi(100)
 
 real(8) a(nzm),b,c(nzm),e,fff(nzm)	

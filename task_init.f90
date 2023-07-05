@@ -34,7 +34,7 @@ else
 
   dompi = .true.
 
-  call systemf('hostname')
+  call system('hostname')
 
   if(ntasks.ne.nsubdomains) then
     if(rank.eq.0) print *,'number of processors is not equal to nsubdomains!',&
